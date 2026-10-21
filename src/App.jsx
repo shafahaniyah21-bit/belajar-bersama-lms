@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   GraduationCap, LayoutDashboard, Users, BookOpen, ClipboardCheck,
   FileText, BarChart3, MessageCircle, Award, Settings, LogOut, Menu,
-  Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X
+  Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X, Upload, Download
 } from 'lucide-react';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -78,6 +78,8 @@ function App() {
   const [classes, setClasses] = useState([]);
   const [courses, setCourses] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [attendance, setAttendance] = useState([]);
   const [posts, setPosts] = useState([]);
   const [grades, setGrades] = useState([]);
@@ -107,17 +109,18 @@ function App() {
 
   async function loadData() {
     if (!supabase) return;
-    const [u,c,co,a,at,p,g] = await Promise.all([
+    const [u,c,co,a,at,p,g,sub] = await Promise.all([
       supabase.from('profiles').select('id,full_name,email,role,created_at').order('created_at',{ascending:false}).limit(100),
       supabase.from('classes').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('courses').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('assignments').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('attendance').select('*').order('date',{ascending:false}).limit(100),
       supabase.from('forum_posts').select('*').order('created_at',{ascending:false}).limit(100),
-      supabase.from('grades').select('*').order('created_at',{ascending:false}).limit(100)
+      supabase.from('grades').select('*').order('created_at',{ascending:false}).limit(100),
+      supabase.from('submissions').select('*').order('submitted_at',{ascending:false}).limit(200)
     ]);
     setUsers(u.data||[]); setClasses(c.data||[]); setCourses(co.data||[]); setAssignments(a.data||[]);
-    setAttendance(at.data||[]); setPosts(p.data||[]); setGrades(g.data||[]);
+    setAttendance(at.data||[]); setPosts(p.data||[]); setGrades(g.data||[]); setSubmissions(sub.data||[]);
     setSummary({users:u.data?.length||0,classes:c.data?.length||0,assignments:a.data?.length||0,attendance:at.data?.length||0});
   }
 
@@ -127,10 +130,66 @@ function App() {
     const { error } = await supabase.from('courses').insert({ title: fd.get('title'), description: fd.get('description'), created_by: session.user.id });
     if (error) setMessage(error.message); else { setMessage('Materi berhasil ditambahkan.'); setShowCreate(false); loadData(); }
   }
+  const MAX_FILE_BYTES = 20 * 1024 * 1024;
+  async function uploadLmsFile(file, kind, assignmentId) {
+    if (!file) return null;
+    if (file.size > MAX_FILE_BYTES) throw new Error('Ukuran file maksimal 20 MB.');
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100);
+    const path = `${session.user.id}/${kind}/${assignmentId}/${crypto.randomUUID()}-${safeName}`;
+    const { error } = await supabase.storage.from('lms-files').upload(path, file, {
+      upsert: false, contentType: file.type || 'application/octet-stream'
+    });
+    if (error) throw error;
+    return path;
+  }
+  async function downloadLmsFile(path) {
+    if (!path) return;
+    const { data, error } = await supabase.storage.from('lms-files').createSignedUrl(path, 60);
+    if (error) { setMessage(`Gagal mengunduh: ${error.message}`); return; }
+    window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+  }
   async function createAssignment(e) {
-    e.preventDefault(); const fd = new FormData(e.currentTarget);
-    const { error } = await supabase.from('assignments').insert({ title: fd.get('title'), description: fd.get('description'), due_at: fd.get('due_at') || null, created_by: session.user.id });
-    if (error) setMessage(error.message); else { setMessage('Tugas berhasil dibuat.'); setShowCreate(false); loadData(); }
+    e.preventDefault();
+    if (!canManage || uploading) return;
+    const fd = new FormData(e.currentTarget);
+    const file = fd.get('attachment');
+    setUploading(true);
+    try {
+      const { data, error } = await supabase.from('assignments').insert({
+        title: fd.get('title'), description: fd.get('description'),
+        due_at: fd.get('due_at') || null, created_by: session.user.id
+      }).select('id').single();
+      if (error) throw error;
+      if (file instanceof File && file.size > 0) {
+        const path = await uploadLmsFile(file, 'assignments', data.id);
+        const { error: saveError } = await supabase.from('assignments')
+          .update({ attachment_path: path }).eq('id', data.id);
+        if (saveError) throw saveError;
+      }
+      setMessage('Tugas berhasil dibuat.'); setShowCreate(false); await loadData();
+    } catch (err) { setMessage(`Gagal menyelesaikan pembuatan tugas: ${err.message}. Periksa apakah tugas sudah tersimpan sebelum mencoba lagi.`); }
+    finally { setUploading(false); }
+  }
+  async function submitAssignment(e, assignmentId) {
+    e.preventDefault();
+    if (uploading || canManage) return;
+    const fd = new FormData(e.currentTarget);
+    const file = fd.get('answer_file');
+    const answer = String(fd.get('answer_text') || '').trim();
+    if ((!file || !file.size) && !answer) { setMessage('Isi jawaban atau pilih file dahulu.'); return; }
+    setUploading(true);
+    try {
+      const existing = submissions.find(s => s.assignment_id === assignmentId && s.student_id === session.user.id);
+      let path = existing?.file_url || null;
+      if (file instanceof File && file.size > 0) path = await uploadLmsFile(file, 'submissions', assignmentId);
+      const payload = { answer_text: answer, file_url: path, submitted_at: new Date().toISOString() };
+      const result = existing
+        ? await supabase.from('submissions').update(payload).eq('id', existing.id)
+        : await supabase.from('submissions').insert({ ...payload, assignment_id: assignmentId, student_id: session.user.id });
+      if (result.error) throw result.error;
+      setMessage('Jawaban berhasil dikumpulkan.'); await loadData();
+    } catch (err) { setMessage(`Gagal mengumpulkan jawaban: ${err.message}`); }
+    finally { setUploading(false); }
   }
   async function createPost(e) {
     e.preventDefault(); const fd = new FormData(e.currentTarget);
@@ -168,15 +227,36 @@ function App() {
       {active==='Dashboard'&&<><div className="welcome-card"><div><span className="eyebrow light">PUSAT PEMBELAJARAN</span><h2>Langkah kecil hari ini,<br/>kemajuan besar esok hari.</h2><p>Semua aktivitas belajar dimulai dari sini.</p></div><div className="welcome-art"><GraduationCap size={88}/></div></div><div className="section-head"><h3>Ringkasan LMS</h3><span>Data yang dapat kamu akses</span></div><div className="stat-grid">{(isAdmin?[['Total pengguna',summary.users,Users],['Kelas tersedia',summary.classes,BookOpen],['Tugas dibuat',summary.assignments,FileText],['Catatan absensi',summary.attendance,CalendarCheck]]: [['Kelas tersedia',summary.classes,BookOpen],['Tugas tersedia',summary.assignments,FileText],['Catatan absensi',summary.attendance,CalendarCheck],['Nilai tercatat',grades.length,BarChart3]]).map(([label,value,I],i)=><div className="stat-card" key={label}><div className={`stat-icon tone-${i}`}><I size={20}/></div><div><span>{label}</span><strong>{value}</strong></div></div>)}</div><div className="dashboard-grid"><section className="panel"><div className="panel-head"><div><h3>Materi terbaru</h3><p>Materi yang tersedia di LMS</p></div><button className="text-button" onClick={()=>setActive('Kelas & Materi')}>Lihat semua</button></div>{courses.slice(0,4).length?courses.slice(0,4).map(c=><div className="list-row" key={c.id}><div className="row-icon"><BookOpen size={18}/></div><div className="row-copy"><b>{c.title}</b><small>{c.description||'Materi pembelajaran'}</small></div><span className="pill">Materi</span></div>):<div className="empty">Belum ada materi yang ditambahkan.</div>}</section><section className="panel"><div className="panel-head"><div><h3>Aktivitas terbaru</h3><p>Ringkasan kegiatan</p></div></div>{assignments.slice(0,3).map(a=><div className="activity" key={a.id}><span className="activity-dot"/><div><b>{a.title}</b><small>Tugas baru · {a.due_at?new Date(a.due_at).toLocaleDateString('id-ID'):'Tanpa tenggat'}</small></div></div>)}{!assignments.length&&<div className="empty">Aktivitas akan muncul di sini.</div>}</section></div></>}
       {active==='Pengguna'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Manajemen pengguna</h3><p>Atur peran pengguna yang sudah terdaftar</p></div><div className="searchbox"><Search size={16}/><input placeholder="Cari nama atau email…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Pengguna</th><th>Email</th><th>Peran</th><th>Terdaftar</th></tr></thead><tbody>{filteredUsers.map(u=><tr key={u.id}><td><b>{u.full_name||'—'}</b></td><td>{u.email||'—'}</td><td><select value={u.role} disabled={u.id===session.user.id} onChange={e=>changeRole(u.id,e.target.value)}><option value="murid">Murid</option><option value="guru">Guru</option><option value="admin">Admin</option></select></td><td>{u.created_at?new Date(u.created_at).toLocaleDateString('id-ID'):'—'}</td></tr>)}</tbody></table></div><p className="hint">Perubahan peran dibatasi oleh kebijakan database. Akun Admin utama sebaiknya tidak diturunkan perannya.</p></section>}
       {active==='Kelas & Materi'&&<><div className="section-head"><h3>Materi pembelajaran</h3><span>{courses.length} materi</span></div><div className="cards-grid">{courses.map(c=><article className="course-card" key={c.id}><div className="course-cover"><BookOpen size={28}/><span>MODUL PEMBELAJARAN</span></div><div className="course-body"><h3>{c.title}</h3><p>{c.description||'Belum ada deskripsi.'}</p><small>Dibuat {new Date(c.created_at).toLocaleDateString('id-ID')}</small></div></article>)}</div>{!courses.length&&<div className="panel empty">Belum ada materi. {canManage?'Gunakan tombol Tambah Materi untuk memulai.':'Materi akan tampil setelah guru mengunggahnya.'}</div>}</>}
-      {active==='Tugas & Kuis'&&<section className="panel"><div className="panel-head"><div><h3>Daftar tugas</h3><p>Tugas dan kuis pembelajaran</p></div></div>{assignments.map(a=><div className="list-row" key={a.id}><div className="row-icon"><ClipboardCheck size={18}/></div><div className="row-copy"><b>{a.title}</b><small>{a.description||'Tidak ada instruksi tambahan'}</small></div><span className="pill">{a.due_at?`Tenggat ${new Date(a.due_at).toLocaleDateString('id-ID')}`:'Tanpa tenggat'}</span></div>)}{!assignments.length&&<div className="empty">Belum ada tugas atau kuis.</div>}</section>}
-      {active==='Absensi'&&<section className="panel"><div className="panel-head"><div><h3>Absensi murid</h3><p>Rekap catatan kehadiran</p></div></div><div className="table-wrap"><table><thead><tr><th>Tanggal</th><th>ID Murid</th><th>Status</th><th>Catatan</th></tr></thead><tbody>{attendance.map(a=><tr key={a.id}><td>{a.date}</td><td>{a.student_id}</td><td><span className="pill">{a.status}</span></td><td>{a.note||'—'}</td></tr>)}</tbody></table></div>{!attendance.length&&<div className="empty">Belum ada catatan absensi.</div>}</section>}
+             {active==='Tugas & Kuis'&&<section className="panel"><div className="panel-head"><div><h3>Daftar tugas</h3><p>Tugas dan kuis pembelajaran</p></div></div>
+         {assignments.map(a => {
+           const mine = submissions.find(s => s.assignment_id === a.id && s.student_id === session.user.id);
+           const related = submissions.filter(s => s.assignment_id === a.id);
+           return <div className="list-row" key={a.id} style={{alignItems:'flex-start', flexWrap:'wrap', gap:12}}>
+             <div className="row-icon"><ClipboardCheck size={18}/></div>
+             <div className="row-copy" style={{minWidth:220, flex:'1 1 280px'}}>
+               <b>{a.title}</b><small>{a.description||'Tidak ada instruksi tambahan'}</small>
+               {a.attachment_path && <button type="button" className="secondary" style={{marginTop:10}} onClick={()=>downloadLmsFile(a.attachment_path)}><Download size={15}/> Unduh lampiran tugas</button>}
+               {!canManage && <form onSubmit={e=>submitAssignment(e,a.id)} style={{marginTop:12,display:'grid',gap:8}}>
+                 <label>Jawaban<textarea name="answer_text" rows="2" defaultValue={mine?.answer_text||''} placeholder="Tulis jawaban (opsional jika mengunggah file)"/></label>
+                 <label>Upload jawaban (maks. 20 MB)<input name="answer_file" type="file" /></label>
+                 {mine?.file_url && <button type="button" className="secondary" onClick={()=>downloadLmsFile(mine.file_url)}><Download size={15}/> Lihat file jawaban saya</button>}
+                 <button className="primary" disabled={uploading}><Upload size={15}/>{uploading?'Mengunggah…':mine?'Perbarui jawaban':'Kumpulkan jawaban'}</button>
+               </form>}
+               {canManage && related.length>0 && <div style={{marginTop:12}}><b>Pengumpulan ({related.length})</b>{related.map(s=><div key={s.id} style={{marginTop:8}}><small>Murid: {users.find(u=>u.id===s.student_id)?.full_name || s.student_id}</small>{s.answer_text&&<small>{s.answer_text}</small>}{s.file_url&&<button type="button" className="secondary" onClick={()=>downloadLmsFile(s.file_url)}><Download size={15}/> Unduh jawaban</button>}</div>)}</div>}
+             </div>
+             <span className="pill">{a.due_at?`Tenggat ${new Date(a.due_at).toLocaleDateString('id-ID')}`:'Tanpa tenggat'}</span>
+           </div>;
+         })}
+         {!assignments.length&&<div className="empty">Belum ada tugas atau kuis.</div>}
+       </section>}
+{active==='Absensi'&&<section className="panel"><div className="panel-head"><div><h3>Absensi murid</h3><p>Rekap catatan kehadiran</p></div></div><div className="table-wrap"><table><thead><tr><th>Tanggal</th><th>ID Murid</th><th>Status</th><th>Catatan</th></tr></thead><tbody>{attendance.map(a=><tr key={a.id}><td>{a.date}</td><td>{a.student_id}</td><td><span className="pill">{a.status}</span></td><td>{a.note||'—'}</td></tr>)}</tbody></table></div>{!attendance.length&&<div className="empty">Belum ada catatan absensi.</div>}</section>}
       {active==='Forum Diskusi'&&<section className="panel"><div className="panel-head"><div><h3>Forum diskusi</h3><p>Berbagi pertanyaan dan berdiskusi</p></div></div>{posts.map(p=><article className="forum-post" key={p.id}><div className="row-icon"><MessageCircle size={18}/></div><div><h3>{p.title}</h3><p>{p.body}</p><small>{new Date(p.created_at).toLocaleString('id-ID')}</small></div></article>)}{!posts.length&&<div className="empty">Belum ada diskusi.</div>}</section>}
       {active==='Laporan Akademik'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Ringkasan akademik</h3><p>Data agregat dari tabel LMS</p></div></div><div className="report-grid"><div><span>Total pengguna</span><b>{summary.users}</b></div><div><span>Total kelas</span><b>{summary.classes}</b></div><div><span>Total tugas</span><b>{summary.assignments}</b></div><div><span>Catatan absensi</span><b>{summary.attendance}</b></div><div><span>Nilai tercatat</span><b>{grades.length}</b></div><div><span>Diskusi</span><b>{posts.length}</b></div></div><button className="secondary" onClick={()=>{const csv='nama,email,peran\\n'+users.map(u=>[u.full_name,u.email,u.role].map(x=>`"${String(x||'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='laporan-pengguna-belajar-bersama.csv';a.click();URL.revokeObjectURL(a.href)}}>Unduh laporan pengguna (CSV)</button></section>}
       {active==='Sertifikat'&&<section className="panel"><div className="panel-head"><div><h3>Sertifikat penyelesaian</h3><p>Sertifikat akan tercatat di sini setelah fitur penerbitan diaktifkan.</p></div></div><div className="empty"><Award size={28}/><b>Belum ada sertifikat</b><span>Admin dapat mengembangkan aturan penerbitan sertifikat berdasarkan penyelesaian kelas dan nilai minimum.</span></div></section>}
       {active==='Pengaturan'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Pengaturan sistem</h3><p>Informasi aplikasi dan keamanan</p></div></div><div className="settings-row"><div><b>Nama LMS</b><p>Belajar Bersama</p></div><span className="pill success">Aktif</span></div><div className="settings-row"><div><b>Akun aktif</b><p>{session.user.email}</p></div><span className="pill">{profile.role}</span></div><div className="settings-row"><div><b>Database</b><p>Supabase PostgreSQL dengan Row Level Security</p></div><ShieldCheck size={20}/></div><p className="hint">Jangan memasukkan service-role key ke frontend. Kelola rahasia dari dashboard Supabase dan environment variables hosting.</p></section>}
       </div>
     </main>
-    {showCreate&&<div className="modal-backdrop" onClick={()=>setShowCreate(false)}><div className="modal" onClick={e=>e.stopPropagation()}><div className="modal-head"><h2>{active==='Kelas & Materi'?'Tambah materi':active==='Tugas & Kuis'?'Buat tugas':'Buat diskusi'}</h2><button className="icon-button" onClick={()=>setShowCreate(false)}><X/></button></div><form onSubmit={active==='Kelas & Materi'?createCourse:active==='Tugas & Kuis'?createAssignment:createPost}><label>Judul<input name="title" required maxLength="160" placeholder="Masukkan judul"/></label>{active==='Tugas & Kuis'&&<label>Tenggat waktu<input name="due_at" type="datetime-local"/></label>}<label>{active==='Forum Diskusi'?'Isi diskusi':'Deskripsi / instruksi'}<textarea name={active==='Forum Diskusi'?'body':'description'} rows="4" placeholder="Tulis keterangan…" /></label><button className="primary full"><Plus size={16}/> Simpan</button></form></div></div>}
+    {showCreate&&<div className="modal-backdrop" onClick={()=>setShowCreate(false)}><div className="modal" onClick={e=>e.stopPropagation()}><div className="modal-head"><h2>{active==='Kelas & Materi'?'Tambah materi':active==='Tugas & Kuis'?'Buat tugas':'Buat diskusi'}</h2><button className="icon-button" onClick={()=>setShowCreate(false)}><X/></button></div><form onSubmit={active==='Kelas & Materi'?createCourse:active==='Tugas & Kuis'?createAssignment:createPost}><label>Judul<input name="title" required maxLength="160" placeholder="Masukkan judul"/></label>{active==='Tugas & Kuis'&&<><label>Tenggat waktu<input name="due_at" type="datetime-local"/></label><label>Lampiran tugas (opsional, maks. 20 MB)<input name="attachment" type="file"/></label></>}<label>{active==='Forum Diskusi'?'Isi diskusi':'Deskripsi / instruksi'}<textarea name={active==='Forum Diskusi'?'body':'description'} rows="4" placeholder="Tulis keterangan…" /></label><button className="primary full" disabled={uploading}><Plus size={16}/>{uploading?'Mengunggah…':'Simpan'}</button></form></div></div>}
   </div>;
 }
 
