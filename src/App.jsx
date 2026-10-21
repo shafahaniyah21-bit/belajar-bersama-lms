@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   GraduationCap, LayoutDashboard, Users, BookOpen, ClipboardCheck,
   FileText, BarChart3, MessageCircle, Award, Settings, LogOut, Menu,
-  Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X, Upload, Download
+  Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X, Upload, Download, Trash2
 } from 'lucide-react';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -170,6 +170,24 @@ function App() {
     } catch (err) { setMessage(`Gagal menyelesaikan pembuatan tugas: ${err.message}. Periksa apakah tugas sudah tersimpan sebelum mencoba lagi.`); }
     finally { setUploading(false); }
   }
+  async function deleteAssignment(assignment) {
+    if (!isAdmin || uploading) return;
+    const confirmed = window.confirm(`Hapus tugas "${assignment.title}"?\n\nTindakan ini tidak dapat dibatalkan. Pastikan jawaban murid sudah dicadangkan.`);
+    if (!confirmed) return;
+    setUploading(true);
+    try {
+      const { error } = await supabase.from('assignments')
+        .delete().eq('id', assignment.id).select('id').single();
+      if (error) throw error;
+      setMessage('Tugas berhasil dihapus dari database. File lampiran yang tersimpan perlu dibersihkan secara terpisah.');
+      await loadData();
+    } catch (err) {
+      setMessage(`Gagal menghapus tugas: ${err.message}. Jika sudah ada pengumpulan murid, jangan hapus datanya sebelum dicadangkan.`);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function submitAssignment(e, assignmentId) {
     e.preventDefault();
     if (uploading || canManage) return;
@@ -244,7 +262,14 @@ function App() {
                </form>}
                {canManage && related.length>0 && <div style={{marginTop:12}}><b>Pengumpulan ({related.length})</b>{related.map(s=><div key={s.id} style={{marginTop:8}}><small>Murid: {users.find(u=>u.id===s.student_id)?.full_name || s.student_id}</small>{s.answer_text&&<small>{s.answer_text}</small>}{s.file_url&&<button type="button" className="secondary" onClick={()=>downloadLmsFile(s.file_url)}><Download size={15}/> Unduh jawaban</button>}</div>)}</div>}
              </div>
-             <span className="pill">{a.due_at?`Tenggat ${new Date(a.due_at).toLocaleDateString('id-ID')}`:'Tanpa tenggat'}</span>
+                           <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8}}>
+                <span className="pill">{a.due_at?`Tenggat ${new Date(a.due_at).toLocaleDateString('id-ID')}`:'Tanpa tenggat'}</span>
+                {isAdmin && <button type="button" className="secondary" disabled={uploading}
+                  onClick={() => deleteAssignment(a)}
+                  style={{color:'#b42318', borderColor:'#fecdca'}}>
+                  <Trash2 size={15}/> Hapus tugas
+                </button>}
+              </div>
            </div>;
          })}
          {!assignments.length&&<div className="empty">Belum ada tugas atau kuis.</div>}
