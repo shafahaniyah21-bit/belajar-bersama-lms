@@ -287,7 +287,7 @@ async function deleteCourse(course) {
         student_id: session.user.id,
         student_name: profile.full_name || session.user.email || 'Murid',
         nisn,
-        class_id: null,
+        class_id: fd.get('class_id') || null,
         status,
         note: String(fd.get('note') || '').trim() || null,
         recorded_by: session.user.id
@@ -535,6 +535,19 @@ async function deleteCourse(course) {
         <div className="student-attendance-fields">
           <label>Nama Murid<input type="text" readOnly value={profile.full_name || session.user.email || 'Murid'} /></label>
           <label>NISN<input name="nisn" type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder="Masukkan 10 digit NISN" required /></label>
+          
+<label>
+  Kelas
+  <select name="class_id" required defaultValue="">
+    <option value="">Pilih kelas</option>
+    {classes.map(c => (
+      <option key={c.id} value={c.id}>
+        {c.name}
+      </option>
+    ))}
+  </select>
+</label>
+
           <label>Status Kehadiran<select name="status" required defaultValue="hadir"><option value="hadir">Hadir</option><option value="izin">Izin</option><option value="sakit">Sakit</option></select></label>
           <label>Catatan (opsional)<textarea name="note" rows="2" placeholder="Keterangan tambahan jika diperlukan" /></label>
         </div>
