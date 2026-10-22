@@ -462,14 +462,14 @@ async function deleteCourse(course) {
          {assignments.map(a => {
            const mine = submissions.find(s => s.assignment_id === a.id && s.student_id === session.user.id);
            const related = submissions.filter(s => s.assignment_id === a.id);
-           return <div className="list-row" key={a.id} style={{alignItems:'flex-start', flexWrap:'wrap', gap:12}}>
+           return <div className="list-row assignment-card" key={a.id} style={{alignItems:'flex-start', flexWrap:'wrap', gap:12}}>
              <div className="row-icon"><ClipboardCheck size={18}/></div>
-             <div className="row-copy" style={{minWidth:220, flex:'1 1 280px'}}>
+             <div className="row-copy assignment-body" style={{minWidth:220, flex:'1 1 280px'}}>
                <b>{a.title}</b><small>{a.description||'Tidak ada instruksi tambahan'}</small>
                {a.attachment_path && <button type="button" className="secondary" style={{marginTop:10}} onClick={()=>downloadLmsFile(a.attachment_path)}><Download size={15}/> Unduh lampiran tugas</button>}
-               {!canManage && <form onSubmit={e=>submitAssignment(e,a.id)} style={{marginTop:12,display:'grid',gap:8}}>
-                 <label>Jawaban<textarea name="answer_text" rows="2" defaultValue={mine?.answer_text||''} placeholder="Tulis jawaban (opsional jika mengunggah file)"/></label>
-                 <label>Upload jawaban (maks. 20 MB)<input name="answer_file" type="file" /></label>
+               {!canManage && <form className="assignment-answer-form" onSubmit={e=>submitAssignment(e,a.id)} style={{marginTop:12,display:'grid',gap:8}}>
+                 <label>Jawaban tertulis<textarea name="answer_text" rows="3" defaultValue={mine?.answer_text||''} placeholder="Tulis jawaban (opsional jika mengunggah file)"/></label>
+                 <label>Unggah file jawaban <span className="assignment-optional">(maks. 20 MB)</span><input name="answer_file" type="file" /></label>
                  {mine?.file_url && <button type="button" className="secondary" onClick={()=>downloadLmsFile(mine.file_url)}><Download size={15}/> Lihat file jawaban saya</button>}
                  <button className="primary" disabled={uploading}><Upload size={15}/>{uploading?'Mengunggah…':mine?'Perbarui jawaban':'Kumpulkan jawaban'}</button>
                </form>}
