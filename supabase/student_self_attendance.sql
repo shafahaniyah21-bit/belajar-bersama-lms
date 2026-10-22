@@ -4,7 +4,7 @@
 begin;
 create or replace function public.has_attendance_today(p_student_id uuid)
 returns boolean language sql stable security definer set search_path = ''
-as $ select exists(select 1 from public.attendance a where a.student_id = p_student_id and a.date = (now() at time zone 'Asia/Jakarta')::date); $;
+as $$ select exists(select 1 from public.attendance a where a.student_id = p_student_id and a.date = (now() at time zone 'Asia/Jakarta')::date); $$;
 revoke all on function public.has_attendance_today(uuid) from public;
 grant execute on function public.has_attendance_today(uuid) to authenticated;
 drop policy if exists "staff manages attendance" on public.attendance;
