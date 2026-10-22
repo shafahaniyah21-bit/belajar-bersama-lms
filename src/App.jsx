@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   GraduationCap, LayoutDashboard, Users, BookOpen, ClipboardCheck,
   FileText, BarChart3, MessageCircle, Award, Settings, LogOut, Menu,
-  Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X, Upload, Download, Trash2
+  Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X, Upload, Download, Trash2, UserRound, KeyRound, ChevronDown
 } from 'lucide-react';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -86,6 +86,10 @@ function App() {
   const [grades, setGrades] = useState([]);
   const [message, setMessage] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [profileDialog, setProfileDialog] = useState(null);
+  const [profileBusy, setProfileBusy] = useState(false);
+  const [profileFeedback, setProfileFeedback] = useState('');
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
@@ -345,6 +349,45 @@ async function deleteCourse(course) {
     setMessage(error ? error.message : 'Peran pengguna diperbarui.'); if (!error) loadData();
   }
 
+  async function saveMyProfile(e) {
+    e.preventDefault();
+    if (!session || profileBusy) return;
+    const name = String(new FormData(e.currentTarget).get('full_name') || '').trim();
+    if (!name || name.length > 120) { setProfileFeedback('Nama harus diisi (maksimal 120 karakter).'); return; }
+    setProfileBusy(true); setProfileFeedback('');
+    try {
+      const { data, error } = await supabase.from('profiles').update({ full_name: name }).eq('id', session.user.id).select('id,full_name').single();
+      if (error) throw error;
+      setProfile(prev => ({ ...prev, full_name: data.full_name }));
+      setUsers(prev => prev.map(u => u.id === session.user.id ? { ...u, full_name: data.full_name } : u));
+      setProfileDialog(null); setMessage('Nama profil berhasil diperbarui.');
+    } catch (err) { setProfileFeedback('Gagal memperbarui profil: ' + err.message); }
+    finally { setProfileBusy(false); }
+  }
+
+  async function saveMyPassword(e) {
+    e.preventDefault();
+    if (profileBusy) return;
+    const fd = new FormData(e.currentTarget);
+    const password = String(fd.get('password') || '');
+    const confirm = String(fd.get('confirm_password') || '');
+    if (password.length < 8) { setProfileFeedback('Password minimal 8 karakter.'); return; }
+    if (password !== confirm) { setProfileFeedback('Konfirmasi password tidak sama.'); return; }
+    setProfileBusy(true); setProfileFeedback('');
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      setProfileDialog(null); setMessage('Password berhasil diperbarui.');
+    } catch (err) { setProfileFeedback('Gagal mengubah password: ' + err.message + '. Jika diminta verifikasi ulang, ikuti instruksi email dari Supabase.'); }
+    finally { setProfileBusy(false); }
+  }
+
+  function openProfileDialog(kind) {
+    setProfileMenuOpen(false);
+    setProfileFeedback('');
+    setProfileDialog(kind);
+  }
+
   const isAdmin = profile?.role === 'admin';
   const isTeacher = profile?.role === 'guru';
   const canManage = isAdmin || isTeacher;
@@ -365,7 +408,17 @@ async function deleteCourse(course) {
       <div className="sidebar-bottom"><div className="mini-profile"><div className="avatar">{(profile.full_name||session.user.email||'U').slice(0,1).toUpperCase()}</div><div className="profile-text"><b>{profile.full_name||'Pengguna'}</b><small>{profile.role}</small></div><button className="icon-button" title="Keluar" onClick={logout}><LogOut size={17}/></button></div></div>
     </aside>
     {mobileNav&&<div className="scrim" onClick={()=>setMobileNav(false)}/>}
-    <main className="main"><header className="topbar"><button className="icon-button mobile-menu" onClick={()=>setMobileNav(!mobileNav)}><Menu/></button><div className="breadcrumb">Belajar Bersama <span>/</span> <b>{pageTitle}</b></div><div className="top-actions"><span className="date-label">Portal Pembelajaran</span><button className="icon-button" title="Notifikasi"><Bell size={19}/></button><div className="avatar small">{(profile.full_name||'U').slice(0,1).toUpperCase()}</div></div></header>
+    <main className="main"><header className="topbar"><button className="icon-button mobile-menu" onClick={()=>setMobileNav(!mobileNav)}><Menu/></button><div className="breadcrumb">Belajar Bersama <span>/</span> <b>{pageTitle}</b></div><div className="top-actions"><button className="icon-button" title="Notifikasi" type="button"><Bell size={19}/></button><div style={{position:'relative'}}>
+      <button type="button" onClick={()=>setProfileMenuOpen(v=>!v)} aria-expanded={profileMenuOpen} aria-haspopup="menu" aria-label="Buka menu profil" style={{display:'flex',alignItems:'center',gap:10,background:'transparent',border:'1px solid #e2e8f0',borderRadius:24,padding:'5px 10px 5px 5px',cursor:'pointer',color:'#24364f'}}>
+        <div className="avatar small">{(profile.full_name||'U').slice(0,1).toUpperCase()}</div><span style={{fontSize:13,fontWeight:600,maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{profile.full_name||'Profil Saya'}</span><ChevronDown size={15}/>
+      </button>
+      {profileMenuOpen && <><button type="button" aria-label="Tutup menu profil" onClick={()=>setProfileMenuOpen(false)} style={{position:'fixed',inset:0,border:0,background:'transparent',zIndex:1000,cursor:'default'}}/><div role="menu" style={{position:'absolute',right:0,top:'calc(100% + 10px)',width:270,zIndex:1001,background:'#fff',border:'1px solid #e2e8f0',borderRadius:14,boxShadow:'0 14px 40px rgba(18,35,61,.16)',padding:10}}>
+        <div style={{padding:'10px 12px',borderBottom:'1px solid #edf1f7',marginBottom:6}}><b style={{display:'block',fontSize:14}}>{profile.full_name||'Pengguna'}</b><small style={{display:'block',color:'#64748b',overflowWrap:'anywhere'}}>{session.user.email}</small><small style={{color:'#64748b',textTransform:'capitalize'}}>{profile.role}</small></div>
+        <button type="button" role="menuitem" onClick={()=>openProfileDialog('edit')} style={{display:'flex',alignItems:'center',gap:12,width:'100%',border:0,background:'transparent',padding:12,textAlign:'left',cursor:'pointer',color:'#253653',borderRadius:8}}><UserRound size={18}/> Edit Profil</button>
+        <button type="button" role="menuitem" onClick={()=>openProfileDialog('password')} style={{display:'flex',alignItems:'center',gap:12,width:'100%',border:0,background:'transparent',padding:12,textAlign:'left',cursor:'pointer',color:'#253653',borderRadius:8}}><KeyRound size={18}/> Ubah Password</button>
+        <button type="button" role="menuitem" onClick={()=>{setProfileMenuOpen(false);logout()}} style={{display:'flex',alignItems:'center',gap:12,width:'100%',border:0,background:'transparent',padding:12,textAlign:'left',cursor:'pointer',color:'#b42318',borderTop:'1px solid #edf1f7',marginTop:5}}><LogOut size={18}/> Log Out</button>
+      </div></>}
+    </div></div></header>
       <div className="content"><div className="page-heading"><div><div className="eyebrow">RUANG KERJA {isAdmin?'ADMIN':isTeacher?'GURU':'MURID'}</div><h1>{active==='Dashboard'?`Selamat datang, ${(profile.full_name||'Pengguna').split(' ')[0]}!`:active}</h1><p>{active==='Dashboard'?'Pantau aktivitas dan kelola pembelajaran hari ini.':`Kelola ${active.toLowerCase()} Belajar Bersama.`}</p></div>{canManage&&['Kelas & Materi','Tugas & Kuis','Forum Diskusi'].includes(active)&&<button className="primary" onClick={openCreate}><Plus size={17}/> Tambah {active==='Kelas & Materi'?'Materi':active==='Tugas & Kuis'?'Tugas':'Diskusi'}</button>}</div>
       {message&&<div className="toast"><CheckCircle2 size={17}/>{message}<button onClick={()=>setMessage('')}><X size={16}/></button></div>}
       {active==='Dashboard'&&<><div className="welcome-card"><div><span className="eyebrow light">PUSAT PEMBELAJARAN</span><h2>Langkah kecil hari ini,<br/>kemajuan besar esok hari.</h2><p>Semua aktivitas belajar dimulai dari sini.</p></div><div className="welcome-art"><GraduationCap size={88}/></div></div><div className="section-head"><h3>Ringkasan LMS</h3><span>Data yang dapat kamu akses</span></div><div className="stat-grid">{(isAdmin?[['Total pengguna',summary.users,Users],['Kelas tersedia',summary.classes,BookOpen],['Tugas dibuat',summary.assignments,FileText],['Catatan absensi',summary.attendance,CalendarCheck]]: [['Kelas tersedia',summary.classes,BookOpen],['Tugas tersedia',summary.assignments,FileText],['Catatan absensi',summary.attendance,CalendarCheck],['Nilai tercatat',grades.length,BarChart3]]).map(([label,value,I],i)=><div className="stat-card" key={label}><div className={`stat-icon tone-${i}`}><I size={20}/></div><div><span>{label}</span><strong>{value}</strong></div></div>)}</div><div className="dashboard-grid"><section className="panel"><div className="panel-head"><div><h3>Materi terbaru</h3><p>Materi yang tersedia di LMS</p></div><button className="text-button" onClick={()=>setActive('Kelas & Materi')}>Lihat semua</button></div>{courses.slice(0,4).length?courses.slice(0,4).map(c=><div className="list-row" key={c.id}><div className="row-icon"><BookOpen size={18}/></div><div className="row-copy"><b>{c.title}</b><small>{c.description||'Materi pembelajaran'}</small></div><span className="pill">Materi</span></div>):<div className="empty">Belum ada materi yang ditambahkan.</div>}</section><section className="panel"><div className="panel-head"><div><h3>Aktivitas terbaru</h3><p>Ringkasan kegiatan</p></div></div>{assignments.slice(0,3).map(a=><div className="activity" key={a.id}><span className="activity-dot"/><div><b>{a.title}</b><small>Tugas baru · {a.due_at?new Date(a.due_at).toLocaleDateString('id-ID'):'Tanpa tenggat'}</small></div></div>)}{!assignments.length&&<div className="empty">Aktivitas akan muncul di sini.</div>}</section></div></>}
@@ -510,6 +563,10 @@ async function deleteCourse(course) {
       {active==='Pengaturan'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Pengaturan sistem</h3><p>Informasi aplikasi dan keamanan</p></div></div><div className="settings-row"><div><b>Nama LMS</b><p>Belajar Bersama</p></div><span className="pill success">Aktif</span></div><div className="settings-row"><div><b>Akun aktif</b><p>{session.user.email}</p></div><span className="pill">{profile.role}</span></div><div className="settings-row"><div><b>Database</b><p>Supabase PostgreSQL dengan Row Level Security</p></div><ShieldCheck size={20}/></div><p className="hint">Jangan memasukkan service-role key ke frontend. Kelola rahasia dari dashboard Supabase dan environment variables hosting.</p></section>}
       </div>
     </main>
+    {profileDialog && <div className="modal-backdrop" onClick={()=>!profileBusy&&setProfileDialog(null)}><div className="modal" role="dialog" aria-modal="true" aria-label={profileDialog==='edit'?'Edit Profil':'Ubah Password'} onClick={e=>e.stopPropagation()}><div className="modal-head"><h2>{profileDialog==='edit'?'Edit Profil':'Ubah Password'}</h2><button type="button" className="icon-button" disabled={profileBusy} onClick={()=>setProfileDialog(null)} aria-label="Tutup"><X/></button></div>
+      {profileDialog==='edit' ? <form onSubmit={saveMyProfile}><label>Nama lengkap<input key={profile.full_name} name="full_name" defaultValue={profile.full_name||''} maxLength={120} required autoComplete="name"/></label><label>Email akun<input value={session.user.email||''} disabled readOnly/></label><p className="hint">Email dan peran akun tidak dapat diubah melalui menu ini.</p>{profileFeedback&&<div className="notice">{profileFeedback}</div>}<button className="primary full" disabled={profileBusy}>{profileBusy?'Menyimpan…':'Simpan Perubahan'}</button></form>
+      : <form onSubmit={saveMyPassword}><label>Password baru<input name="password" type="password" autoComplete="new-password" minLength={8} required placeholder="Minimal 8 karakter"/></label><label>Konfirmasi password baru<input name="confirm_password" type="password" autoComplete="new-password" minLength={8} required placeholder="Ulangi password baru"/></label><p className="hint">Supabase dapat meminta verifikasi ulang melalui email demi keamanan akun.</p>{profileFeedback&&<div className="notice">{profileFeedback}</div>}<button className="primary full" disabled={profileBusy}>{profileBusy?'Menyimpan…':'Ubah Password'}</button></form>}
+    </div></div>}
     {showCreate&&<div className="modal-backdrop" onClick={()=>setShowCreate(false)}><div className="modal" onClick={e=>e.stopPropagation()}><div className="modal-head"><h2>{active==='Kelas & Materi'?'Tambah materi':active==='Tugas & Kuis'?'Buat tugas':'Buat diskusi'}</h2><button className="icon-button" onClick={()=>setShowCreate(false)}><X/></button></div><form onSubmit={active==='Kelas & Materi'?createCourse:active==='Tugas & Kuis'?createAssignment:createPost}><label>Judul<input name="title" required maxLength="160" placeholder="Masukkan judul"/></label>
 {active==='Kelas & Materi' && (
   <label>
