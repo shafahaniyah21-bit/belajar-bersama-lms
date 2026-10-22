@@ -192,6 +192,37 @@ function App() {
     if (error) { setMessage(`Gagal mengunduh: ${error.message}`); return; }
     window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
   }
+  
+async function deleteCourse(course) {
+  if (!isAdmin || uploading) return;
+
+  const confirmed = window.confirm(
+    `Yakin ingin menghapus materi "${course.title}"?`
+  );
+
+  if (!confirmed) return;
+
+  setUploading(true);
+
+  try {
+    const { error } = await supabase
+      .from('courses')
+      .delete()
+      .eq('id', course.id)
+      .select('id')
+      .single();
+
+    if (error) throw error;
+
+    setMessage('Materi berhasil dihapus.');
+    await loadData();
+  } catch (err) {
+    setMessage(`Gagal menghapus materi: ${err.message}`);
+  } finally {
+    setUploading(false);
+  }
+}
+
   async function createAssignment(e) {
     e.preventDefault();
     if (!canManage || uploading) return;
@@ -300,6 +331,24 @@ function App() {
     Unduh Materi
   </button>
 )}
+        
+{isAdmin && (
+  <button
+    type="button"
+    className="secondary"
+    disabled={uploading}
+    onClick={() => deleteCourse(c)}
+    style={{
+      marginTop: 10,
+      color: '#b42318',
+      borderColor: '#fecdca'
+    }}
+  >
+    <Trash2 size={15} />
+    Hapus Materi
+  </button>
+)}
+
 
 <small>Dibuat {new Date(c.created_at).toLocaleDateString('id-ID')}</small></div></article>)}</div>{!courses.length&&<div className="panel empty">Belum ada materi. {canManage?'Gunakan tombol Tambah Materi untuk memulai.':'Materi akan tampil setelah guru mengunggahnya.'}</div>}</>}
              {active==='Tugas & Kuis'&&<section className="panel"><div className="panel-head"><div><h3>Daftar tugas</h3><p>Tugas dan kuis pembelajaran</p></div></div>
