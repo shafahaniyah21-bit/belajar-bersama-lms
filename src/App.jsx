@@ -265,6 +265,42 @@ async function deleteCourse(course) {
     } finally { setUploading(false); }
   }
 
+  async function saveStudentAttendance(e) {
+    e.preventDefault();
+    if (profile?.role !== 'murid' || uploading || !session?.user?.id) return;
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const today = new Date();
+    const localDate = [today.getFullYear(), String(today.getMonth()+1).padStart(2,'0'), String(today.getDate()).padStart(2,'0')].join('-');
+    const nisn = String(fd.get('nisn') || '').trim();
+    const status = String(fd.get('status') || '');
+    if (!/^\\d{10}$/.test(nisn)) { setMessage('NISN harus terdiri dari 10 angka.'); return; }
+    if (!['hadir','izin','sakit'].includes(status)) { setMessage('Pilih status kehadiran yang valid.'); return; }
+    if (attendance.some(a => a.student_id === session.user.id && a.date === localDate)) {
+      setMessage('Absensi hari ini sudah tercatat. Hubungi admin jika perlu koreksi.');
+      return;
+    }
+    setUploading(true);
+    try {
+      const { error } = await supabase.from('attendance').insert({
+        date: localDate,
+        student_id: session.user.id,
+        student_name: profile.full_name || session.user.email || 'Murid',
+        nisn,
+        class_id: null,
+        status,
+        note: String(fd.get('note') || '').trim() || null,
+        recorded_by: session.user.id
+      });
+      if (error) throw error;
+      setMessage('Absensi kamu berhasil disimpan. Untuk perubahan, hubungi admin.');
+      form.reset();
+      await loadData();
+    } catch (err) {
+      setMessage('Gagal menyimpan absensi: ' + err.message + '. Pastikan SQL izin absensi murid sudah dijalankan di Supabase.');
+    } finally { setUploading(false); }
+  }
+
   async function deleteAttendance(item) {
     if (!isAdmin || uploading) return;
     if (!window.confirm(`Hapus absensi ${item.student_name || 'murid'} pada ${item.date}? Tindakan ini tidak dapat dibatalkan.`)) return;
@@ -493,6 +529,20 @@ async function deleteCourse(course) {
       <div><h3>Absensi Murid</h3><p>Catat, perbarui, dan kelola kehadiran murid.</p></div>
       <span className="pill">{attendance.length} catatan</span>
     </div>
+    {profile?.role === 'murid' && (
+      <form onSubmit={saveStudentAttendance} className="student-attendance-form">
+        <div className="student-attendance-heading"><div><h3>Isi Absensi Saya</h3><p>Catat kehadiran hari ini menggunakan akunmu sendiri. Data yang tersimpan hanya dapat diubah atau dihapus admin.</p></div><span className="pill">Khusus murid</span></div>
+        <div className="student-attendance-fields">
+          <label>Nama Murid<input type="text" readOnly value={profile.full_name || session.user.email || 'Murid'} /></label>
+          <label>NISN<input name="nisn" type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder="Masukkan 10 digit NISN" required /></label>
+          <label>Status Kehadiran<select name="status" required defaultValue="hadir"><option value="hadir">Hadir</option><option value="izin">Izin</option><option value="sakit">Sakit</option></select></label>
+          <label>Catatan (opsional)<textarea name="note" rows="2" placeholder="Keterangan tambahan jika diperlukan" /></label>
+        </div>
+        <button type="submit" className="primary" disabled={uploading || attendance.some(a=>a.student_id===session.user.id && a.date === [new Date().getFullYear(),String(new Date().getMonth()+1).padStart(2,'0'),String(new Date().getDate()).padStart(2,'0')].join('-'))}>
+          {uploading ? 'Menyimpan…' : attendance.some(a=>a.student_id===session.user.id && a.date === [new Date().getFullYear(),String(new Date().getMonth()+1).padStart(2,'0'),String(new Date().getDate()).padStart(2,'0')].join('-')) ? 'Sudah Absen Hari Ini' : 'Simpan Absensi Saya'}
+        </button>
+      </form>
+    )}
     {isAdmin && (
       <form key={editingAttendance?.id || 'new'} onSubmit={saveAttendance}
         style={{background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:16, padding:20, marginBottom:24}}>
