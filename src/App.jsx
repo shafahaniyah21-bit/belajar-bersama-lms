@@ -491,15 +491,15 @@ async function deleteCourse(course) {
           </select>
         </label>
 
-        <label>
-          Status Kehadiran
-          <select name="status" required defaultValue="Hadir">
-            <option value="Hadir">Hadir</option>
-            <option value="Izin">Izin</option>
-            <option value="Sakit">Sakit</option>
-            <option value="Alpa">Alpa</option>
-          </select>
-        </label>
+      <label>
+  Status Kehadiran
+  <select name="status" required>
+    <option value="hadir">Hadir</option>
+    <option value="izin">Izin</option>
+    <option value="sakit">Sakit</option>
+    <option value="alpa">Alpa</option>
+  </select>
+</label>
 
         <label>
           Catatan
