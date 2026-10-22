@@ -125,11 +125,55 @@ function App() {
   }
 
   async function logout() { await supabase?.auth.signOut(); setSession(null); setProfile(null); }
+ 
   async function createCourse(e) {
-    e.preventDefault(); const fd = new FormData(e.currentTarget);
-    const { error } = await supabase.from('courses').insert({ title: fd.get('title'), description: fd.get('description'), created_by: session.user.id });
-    if (error) setMessage(error.message); else { setMessage('Materi berhasil ditambahkan.'); setShowCreate(false); loadData(); }
+    e.preventDefault();
+    if (!canManage || uploading) return;
+
+    const fd = new FormData(e.currentTarget);
+    const file = fd.get('attachment');
+    setUploading(true);
+
+    try {
+      if (file instanceof File && file.size > MAX_FILE_BYTES) {
+        throw new Error('Ukuran file maksimal 20 MB.');
+      }
+
+      const { data, error } = await supabase
+        .from('courses')
+        .insert({
+          title: fd.get('title'),
+          description: fd.get('description'),
+          created_by: session.user.id
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
+      if (file instanceof File && file.size > 0) {
+        const path = await uploadLmsFile(
+          file, 'courses', data.id
+        );
+
+        const { error: saveError } = await supabase
+          .from('courses')
+          .update({ attachment_path: path })
+          .eq('id', data.id);
+
+        if (saveError) throw saveError;
+      }
+
+      setMessage('Materi berhasil ditambahkan.');
+      setShowCreate(false);
+      await loadData();
+    } catch (err) {
+      setMessage(`Gagal menyimpan materi: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
   }
+
   const MAX_FILE_BYTES = 20 * 1024 * 1024;
   async function uploadLmsFile(file, kind, assignmentId) {
     if (!file) return null;
@@ -244,7 +288,20 @@ function App() {
       {message&&<div className="toast"><CheckCircle2 size={17}/>{message}<button onClick={()=>setMessage('')}><X size={16}/></button></div>}
       {active==='Dashboard'&&<><div className="welcome-card"><div><span className="eyebrow light">PUSAT PEMBELAJARAN</span><h2>Langkah kecil hari ini,<br/>kemajuan besar esok hari.</h2><p>Semua aktivitas belajar dimulai dari sini.</p></div><div className="welcome-art"><GraduationCap size={88}/></div></div><div className="section-head"><h3>Ringkasan LMS</h3><span>Data yang dapat kamu akses</span></div><div className="stat-grid">{(isAdmin?[['Total pengguna',summary.users,Users],['Kelas tersedia',summary.classes,BookOpen],['Tugas dibuat',summary.assignments,FileText],['Catatan absensi',summary.attendance,CalendarCheck]]: [['Kelas tersedia',summary.classes,BookOpen],['Tugas tersedia',summary.assignments,FileText],['Catatan absensi',summary.attendance,CalendarCheck],['Nilai tercatat',grades.length,BarChart3]]).map(([label,value,I],i)=><div className="stat-card" key={label}><div className={`stat-icon tone-${i}`}><I size={20}/></div><div><span>{label}</span><strong>{value}</strong></div></div>)}</div><div className="dashboard-grid"><section className="panel"><div className="panel-head"><div><h3>Materi terbaru</h3><p>Materi yang tersedia di LMS</p></div><button className="text-button" onClick={()=>setActive('Kelas & Materi')}>Lihat semua</button></div>{courses.slice(0,4).length?courses.slice(0,4).map(c=><div className="list-row" key={c.id}><div className="row-icon"><BookOpen size={18}/></div><div className="row-copy"><b>{c.title}</b><small>{c.description||'Materi pembelajaran'}</small></div><span className="pill">Materi</span></div>):<div className="empty">Belum ada materi yang ditambahkan.</div>}</section><section className="panel"><div className="panel-head"><div><h3>Aktivitas terbaru</h3><p>Ringkasan kegiatan</p></div></div>{assignments.slice(0,3).map(a=><div className="activity" key={a.id}><span className="activity-dot"/><div><b>{a.title}</b><small>Tugas baru · {a.due_at?new Date(a.due_at).toLocaleDateString('id-ID'):'Tanpa tenggat'}</small></div></div>)}{!assignments.length&&<div className="empty">Aktivitas akan muncul di sini.</div>}</section></div></>}
       {active==='Pengguna'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Manajemen pengguna</h3><p>Atur peran pengguna yang sudah terdaftar</p></div><div className="searchbox"><Search size={16}/><input placeholder="Cari nama atau email…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Pengguna</th><th>Email</th><th>Peran</th><th>Terdaftar</th></tr></thead><tbody>{filteredUsers.map(u=><tr key={u.id}><td><b>{u.full_name||'—'}</b></td><td>{u.email||'—'}</td><td><select value={u.role} disabled={u.id===session.user.id} onChange={e=>changeRole(u.id,e.target.value)}><option value="murid">Murid</option><option value="guru">Guru</option><option value="admin">Admin</option></select></td><td>{u.created_at?new Date(u.created_at).toLocaleDateString('id-ID'):'—'}</td></tr>)}</tbody></table></div><p className="hint">Perubahan peran dibatasi oleh kebijakan database. Akun Admin utama sebaiknya tidak diturunkan perannya.</p></section>}
-      {active==='Kelas & Materi'&&<><div className="section-head"><h3>Materi pembelajaran</h3><span>{courses.length} materi</span></div><div className="cards-grid">{courses.map(c=><article className="course-card" key={c.id}><div className="course-cover"><BookOpen size={28}/><span>MODUL PEMBELAJARAN</span></div><div className="course-body"><h3>{c.title}</h3><p>{c.description||'Belum ada deskripsi.'}</p><small>Dibuat {new Date(c.created_at).toLocaleDateString('id-ID')}</small></div></article>)}</div>{!courses.length&&<div className="panel empty">Belum ada materi. {canManage?'Gunakan tombol Tambah Materi untuk memulai.':'Materi akan tampil setelah guru mengunggahnya.'}</div>}</>}
+      {active==='Kelas & Materi'&&<><div className="section-head"><h3>Materi pembelajaran</h3><span>{courses.length} materi</span></div><div className="cards-grid">{courses.map(c=><article className="course-card" key={c.id}><div className="course-cover"><BookOpen size={28}/><span>MODUL PEMBELAJARAN</span></div><div className="course-body"><h3>{c.title}</h3><p>{c.description||'Belum ada deskripsi.'}</p>
+        {c.attachment_path && (
+  <button
+    type="button"
+    className="secondary"
+    style={{ marginTop: 10 }}
+    onClick={() => downloadLmsFile(c.attachment_path)}
+  >
+    <Download size={15} />
+    Unduh Materi
+  </button>
+)}
+
+<small>Dibuat {new Date(c.created_at).toLocaleDateString('id-ID')}</small></div></article>)}</div>{!courses.length&&<div className="panel empty">Belum ada materi. {canManage?'Gunakan tombol Tambah Materi untuk memulai.':'Materi akan tampil setelah guru mengunggahnya.'}</div>}</>}
              {active==='Tugas & Kuis'&&<section className="panel"><div className="panel-head"><div><h3>Daftar tugas</h3><p>Tugas dan kuis pembelajaran</p></div></div>
          {assignments.map(a => {
            const mine = submissions.find(s => s.assignment_id === a.id && s.student_id === session.user.id);
@@ -281,7 +338,18 @@ function App() {
       {active==='Pengaturan'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Pengaturan sistem</h3><p>Informasi aplikasi dan keamanan</p></div></div><div className="settings-row"><div><b>Nama LMS</b><p>Belajar Bersama</p></div><span className="pill success">Aktif</span></div><div className="settings-row"><div><b>Akun aktif</b><p>{session.user.email}</p></div><span className="pill">{profile.role}</span></div><div className="settings-row"><div><b>Database</b><p>Supabase PostgreSQL dengan Row Level Security</p></div><ShieldCheck size={20}/></div><p className="hint">Jangan memasukkan service-role key ke frontend. Kelola rahasia dari dashboard Supabase dan environment variables hosting.</p></section>}
       </div>
     </main>
-    {showCreate&&<div className="modal-backdrop" onClick={()=>setShowCreate(false)}><div className="modal" onClick={e=>e.stopPropagation()}><div className="modal-head"><h2>{active==='Kelas & Materi'?'Tambah materi':active==='Tugas & Kuis'?'Buat tugas':'Buat diskusi'}</h2><button className="icon-button" onClick={()=>setShowCreate(false)}><X/></button></div><form onSubmit={active==='Kelas & Materi'?createCourse:active==='Tugas & Kuis'?createAssignment:createPost}><label>Judul<input name="title" required maxLength="160" placeholder="Masukkan judul"/></label>{active==='Tugas & Kuis'&&<><label>Tenggat waktu<input name="due_at" type="datetime-local"/></label><label>Lampiran tugas (opsional, maks. 20 MB)<input name="attachment" type="file"/></label></>}<label>{active==='Forum Diskusi'?'Isi diskusi':'Deskripsi / instruksi'}<textarea name={active==='Forum Diskusi'?'body':'description'} rows="4" placeholder="Tulis keterangan…" /></label><button className="primary full" disabled={uploading}><Plus size={16}/>{uploading?'Mengunggah…':'Simpan'}</button></form></div></div>}
+    {showCreate&&<div className="modal-backdrop" onClick={()=>setShowCreate(false)}><div className="modal" onClick={e=>e.stopPropagation()}><div className="modal-head"><h2>{active==='Kelas & Materi'?'Tambah materi':active==='Tugas & Kuis'?'Buat tugas':'Buat diskusi'}</h2><button className="icon-button" onClick={()=>setShowCreate(false)}><X/></button></div><form onSubmit={active==='Kelas & Materi'?createCourse:active==='Tugas & Kuis'?createAssignment:createPost}><label>Judul<input name="title" required maxLength="160" placeholder="Masukkan judul"/></label>
+{active==='Kelas & Materi' && (
+  <label>
+    Lampiran materi (opsional, maks. 20 MB)
+    <input
+      name="attachment"
+      type="file"
+      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.jpg,.jpeg,.png"
+    />
+  </label>
+)}
+{active==='Tugas & Kuis'&&<><label>Tenggat waktu<input name="due_at" type="datetime-local"/></label><label>Lampiran tugas (opsional, maks. 20 MB)<input name="attachment" type="file"/></label></>}<label>{active==='Forum Diskusi'?'Isi diskusi':'Deskripsi / instruksi'}<textarea name={active==='Forum Diskusi'?'body':'description'} rows="4" placeholder="Tulis keterangan…" /></label><button className="primary full" disabled={uploading}><Plus size={16}/>{uploading?'Mengunggah…':'Simpan'}</button></form></div></div>}
   </div>;
 }
 
