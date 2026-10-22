@@ -81,6 +81,7 @@ function App() {
   const [submissions, setSubmissions] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [attendance, setAttendance] = useState([]);
+  const [editingAttendance, setEditingAttendance] = useState(null);
   const [posts, setPosts] = useState([]);
   const [grades, setGrades] = useState([]);
   const [message, setMessage] = useState('');
@@ -223,59 +224,56 @@ async function deleteCourse(course) {
   }
 }
 
- async function saveAttendance(e) {
-  e.preventDefault();
-
-  if (!isAdmin || uploading) return;
-
-  const fd = new FormData(e.currentTarget);
-
-  const studentId = fd.get('student_id');
-  const student = users.find(u => u.id === studentId);
-
-  if (!student) {
-    setMessage('Pilih murid yang terdaftar terlebih dahulu.');
-    return;
+  async function saveAttendance(e) {
+    e.preventDefault();
+    if (!isAdmin || uploading) return;
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const studentId = String(fd.get('student_id') || '');
+    const student = users.find(u => u.id === studentId && u.role === 'murid');
+    const nisn = String(fd.get('nisn') || '').trim();
+    if (!student) { setMessage('Pilih murid yang terdaftar.'); return; }
+    if (!/^\d{10}$/.test(nisn)) { setMessage('NISN harus terdiri dari 10 angka.'); return; }
+    const payload = {
+      date: fd.get('date'),
+      student_id: studentId,
+      student_name: student.full_name || student.email || '',
+      nisn,
+      class_id: fd.get('class_id') || null,
+      status: String(fd.get('status') || '').toLowerCase(),
+      note: String(fd.get('note') || '').trim() || null
+    };
+    setUploading(true);
+    try {
+      const result = editingAttendance
+        ? await supabase.from('attendance').update(payload).eq('id', editingAttendance.id).select('id')
+        : await supabase.from('attendance').insert({ ...payload, recorded_by: session.user.id }).select('id');
+      if (result.error) throw result.error;
+      if (!result.data?.length) throw new Error('Tidak ada data berubah. Periksa izin update/insert di Supabase.');
+      setMessage(editingAttendance ? 'Absensi berhasil diperbarui.' : 'Absensi berhasil disimpan.');
+      setEditingAttendance(null);
+      form.reset();
+      await loadData();
+    } catch (err) {
+      setMessage(`Gagal menyimpan absensi: ${err.message}`);
+    } finally { setUploading(false); }
   }
 
-  const studentName = student.full_name || '';
-  const nisn = String(fd.get('nisn') || '').trim();
-  const classId = fd.get('class_id') || null;
-
-  if (!nisn) {
-    setMessage('NISN wajib diisi.');
-    return;
+  async function deleteAttendance(item) {
+    if (!isAdmin || uploading) return;
+    if (!window.confirm(`Hapus absensi ${item.student_name || 'murid'} pada ${item.date}? Tindakan ini tidak dapat dibatalkan.`)) return;
+    setUploading(true);
+    try {
+      const { data, error } = await supabase.from('attendance').delete().eq('id', item.id).select('id');
+      if (error) throw error;
+      if (!data?.length) throw new Error('Data tidak terhapus. Periksa izin delete di Supabase.');
+      if (editingAttendance?.id === item.id) setEditingAttendance(null);
+      setMessage('Absensi berhasil dihapus.');
+      await loadData();
+    } catch (err) { setMessage(`Gagal menghapus absensi: ${err.message}`); }
+    finally { setUploading(false); }
   }
 
-  setUploading(true);
-
-  try {
-    const { error } = await supabase
-      .from('attendance')
-      .insert({
-        date: fd.get('date'),
-        student_id: studentId,
-        student_name: studentName,
-        nisn: nisn,
-        class_id: classId,
-        status: String(fd.get('status') || '').trim().toLowerCase(),
-        note: fd.get('note') || null,
-        recorded_by: session.user.id
-      });
-
-    if (error) throw error;
-
-    setMessage('Absensi berhasil disimpan.');
-    await loadData();
-
-    e.target.reset();
-
-  } catch (err) {
-    setMessage(`Gagal menyimpan absensi: ${err.message}`);
-  } finally {
-    setUploading(false);
-  }
-}
   async function createAssignment(e) {
     e.preventDefault();
     if (!canManage || uploading) return;
@@ -434,124 +432,76 @@ async function deleteCourse(course) {
          {!assignments.length&&<div className="empty">Belum ada tugas atau kuis.</div>}
        </section>}
 {active === 'Absensi' && (
-  <section className="panel">
-    <div className="panel-head">
-      <div>
-        <h3>Absensi Murid</h3>
-        <p>Kelola dan catat kehadiran murid.</p>
-      </div>
+  <section className="panel" style={{padding: 24}}>
+    <div className="panel-head" style={{marginBottom: 22}}>
+      <div><h3>Absensi Murid</h3><p>Catat, perbarui, dan kelola kehadiran murid.</p></div>
+      <span className="pill">{attendance.length} catatan</span>
     </div>
-
     {isAdmin && (
-      <form
-        onSubmit={saveAttendance}
-        style={{ display: 'grid', gap: 12, marginBottom: 24 }}
-      >
-        <h3>Tambah Absensi</h3>
-
-        <label>
-          Tanggal
-          <input name="date" type="date" required />
-        </label>
-
-        <label>
-          Nama Murid
-          <select name="student_id" required defaultValue="">
-            <option value="">Pilih murid</option>
-            {users.filter(u => u.role === 'murid').map(u => (
-              <option key={u.id} value={u.id}>
-                {u.full_name || u.email}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          NISN
-          <input
-            name="nisn"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]{10}"
-            maxLength={10}
-            placeholder="10 digit NISN"
-            required
-          />
-        </label>
-
-        <label>
-          Kelas
-          <select name="class_id" defaultValue="">
-            <option value="">Pilih kelas (opsional)</option>
-            {classes.map(c => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-      <label>
-  Status Kehadiran
-  <select name="status" required>
-    <option value="hadir">Hadir</option>
-    <option value="izin">Izin</option>
-    <option value="sakit">Sakit</option>
-    <option value="alpa">Alpa</option>
-  </select>
-</label>
-
-        <label>
-          Catatan
-          <textarea
-            name="note"
-            rows="2"
-            placeholder="Catatan tambahan (opsional)"
-          />
-        </label>
-
-        <button
-          type="submit"
-          className="primary"
-          disabled={uploading}
-        >
-          {uploading ? 'Menyimpan...' : 'Simpan Absensi'}
-        </button>
+      <form key={editingAttendance?.id || 'new'} onSubmit={saveAttendance}
+        style={{background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:16, padding:20, marginBottom:24}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,marginBottom:18,flexWrap:'wrap'}}>
+          <h3 style={{margin:0}}>{editingAttendance ? 'Edit Absensi' : 'Tambah Absensi'}</h3>
+          {editingAttendance && <button type="button" className="secondary" disabled={uploading}
+            onClick={()=>setEditingAttendance(null)}>Batal Edit</button>}
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',gap:16}}>
+          <label style={{display:'grid',gap:7}}>Tanggal
+            <input style={{width:'100%',boxSizing:'border-box'}} name="date" type="date" required defaultValue={editingAttendance?.date || ''}/>
+          </label>
+          <label style={{display:'grid',gap:7}}>Nama Murid
+            <select style={{width:'100%',boxSizing:'border-box'}} name="student_id" required defaultValue={editingAttendance?.student_id || ''}>
+              <option value="">Pilih murid</option>
+              {users.filter(u=>u.role==='murid').map(u=><option key={u.id} value={u.id}>{u.full_name || u.email}</option>)}
+            </select>
+          </label>
+          <label style={{display:'grid',gap:7}}>NISN
+            <input style={{width:'100%',boxSizing:'border-box'}} name="nisn" type="text" inputMode="numeric" pattern="[0-9]{10}"
+              maxLength={10} placeholder="10 digit NISN" required defaultValue={editingAttendance?.nisn || ''}/>
+          </label>
+          <label style={{display:'grid',gap:7}}>Kelas
+            <select style={{width:'100%',boxSizing:'border-box'}} name="class_id" defaultValue={editingAttendance?.class_id || ''}>
+              <option value="">Pilih kelas (opsional)</option>
+              {classes.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </label>
+          <label style={{display:'grid',gap:7}}>Status Kehadiran
+            <select style={{width:'100%',boxSizing:'border-box'}} name="status" required defaultValue={editingAttendance?.status || 'hadir'}>
+              <option value="hadir">Hadir</option><option value="izin">Izin</option>
+              <option value="sakit">Sakit</option><option value="alpa">Alpa</option>
+            </select>
+          </label>
+          <label style={{display:'grid',gap:7}}>Catatan
+            <textarea style={{width:'100%',boxSizing:'border-box',minHeight:44}} name="note" rows="2"
+              placeholder="Catatan tambahan (opsional)" defaultValue={editingAttendance?.note || ''}/>
+          </label>
+        </div>
+        <div style={{display:'flex',gap:10,marginTop:20,flexWrap:'wrap'}}>
+          <button type="submit" className="primary" disabled={uploading} style={{minWidth:180,justifyContent:'center'}}>
+            {uploading ? 'Memproses…' : editingAttendance ? 'Simpan Perubahan' : 'Simpan Absensi'}
+          </button>
+          {editingAttendance && <button type="button" className="secondary" disabled={uploading} onClick={()=>setEditingAttendance(null)}>Batal</button>}
+        </div>
       </form>
     )}
-
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Nama Murid</th>
-            <th>NISN</th>
-            <th>Kelas</th>
-            <th>Status Kehadiran</th>
-            <th>Catatan</th>
-          </tr>
-        </thead>
-        <tbody>
-          {attendance.map(a => (
-            <tr key={a.id}>
-              <td>{a.date}</td>
-              <td>{a.student_name || '-'}</td>
-              <td>{a.nisn || '-'}</td>
-              <td>
-                {classes.find(c => c.id === a.class_id)?.name || '-'}
-              </td>
-              <td><span className="pill">{a.status}</span></td>
-              <td>{a.note || '-'}</td>
-            </tr>
-          ))}
-        </tbody>
+    <div className="table-wrap" style={{border:'1px solid #e2e8f0',borderRadius:12,overflowX:'auto'}}>
+      <table style={{width:'100%',borderCollapse:'collapse',minWidth:800}}>
+        <thead><tr><th>Tanggal</th><th>Nama Murid</th><th>NISN</th><th>Kelas</th><th>Status</th><th>Catatan</th>{isAdmin&&<th>Aksi</th>}</tr></thead>
+        <tbody>{attendance.map(a=><tr key={a.id}>
+          <td>{a.date ? new Date(`${a.date}T00:00:00`).toLocaleDateString('id-ID') : '-'}</td>
+          <td><b>{a.student_name || users.find(u=>u.id===a.student_id)?.full_name || '-'}</b></td>
+          <td>{a.nisn || '-'}</td>
+          <td>{classes.find(c=>c.id===a.class_id)?.name || '-'}</td>
+          <td><span className="pill">{({hadir:'Hadir',izin:'Izin',sakit:'Sakit',alpa:'Alpa'})[a.status] || a.status}</span></td>
+          <td>{a.note || '-'}</td>
+          {isAdmin&&<td><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            <button type="button" className="secondary" disabled={uploading} onClick={()=>{setEditingAttendance(a);setMessage('');window.scrollTo({top:0,behavior:'smooth'});}}>Edit</button>
+            <button type="button" className="secondary" disabled={uploading} style={{color:'#b42318',borderColor:'#fecdca'}} onClick={()=>deleteAttendance(a)}><Trash2 size={14}/> Hapus</button>
+          </div></td>}
+        </tr>)}</tbody>
       </table>
     </div>
-
-    {!attendance.length && (
-      <div className="empty">Belum ada catatan absensi.</div>
-    )}
+    {!attendance.length && <div className="empty">Belum ada catatan absensi.</div>}
   </section>
 )}
       {active==='Forum Diskusi'&&<section className="panel"><div className="panel-head"><div><h3>Forum diskusi</h3><p>Berbagi pertanyaan dan berdiskusi</p></div></div>{posts.map(p=><article className="forum-post" key={p.id}><div className="row-icon"><MessageCircle size={18}/></div><div><h3>{p.title}</h3><p>{p.body}</p><small>{new Date(p.created_at).toLocaleString('id-ID')}</small></div></article>)}{!posts.length&&<div className="empty">Belum ada diskusi.</div>}</section>}
