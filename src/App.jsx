@@ -223,6 +223,59 @@ async function deleteCourse(course) {
   }
 }
 
+ async function saveAttendance(e) {
+  e.preventDefault();
+
+  if (!isAdmin || uploading) return;
+
+  const fd = new FormData(e.currentTarget);
+
+  const studentId = fd.get('student_id');
+  const student = users.find(u => u.id === studentId);
+
+  if (!student) {
+    setMessage('Pilih murid yang terdaftar terlebih dahulu.');
+    return;
+  }
+
+  const studentName = student.full_name || '';
+  const nisn = String(fd.get('nisn') || '').trim();
+  const classId = fd.get('class_id') || null;
+
+  if (!nisn) {
+    setMessage('NISN wajib diisi.');
+    return;
+  }
+
+  setUploading(true);
+
+  try {
+    const { error } = await supabase
+      .from('attendance')
+      .insert({
+        date: fd.get('date'),
+        student_id: studentId,
+        student_name: studentName,
+        nisn: nisn,
+        class_id: classId,
+        status: fd.get('status'),
+        note: fd.get('note') || null,
+        recorded_by: session.user.id
+      });
+
+    if (error) throw error;
+
+    setMessage('Absensi berhasil disimpan.');
+    await loadData();
+
+    e.target.reset();
+
+  } catch (err) {
+    setMessage(`Gagal menyimpan absensi: ${err.message}`);
+  } finally {
+    setUploading(false);
+  }
+}
   async function createAssignment(e) {
     e.preventDefault();
     if (!canManage || uploading) return;
@@ -380,7 +433,127 @@ async function deleteCourse(course) {
          })}
          {!assignments.length&&<div className="empty">Belum ada tugas atau kuis.</div>}
        </section>}
-{active==='Absensi'&&<section className="panel"><div className="panel-head"><div><h3>Absensi murid</h3><p>Rekap catatan kehadiran</p></div></div><div className="table-wrap"><table><thead><tr><th>Tanggal</th><th>ID Murid</th><th>Status</th><th>Catatan</th></tr></thead><tbody>{attendance.map(a=><tr key={a.id}><td>{a.date}</td><td>{a.student_id}</td><td><span className="pill">{a.status}</span></td><td>{a.note||'—'}</td></tr>)}</tbody></table></div>{!attendance.length&&<div className="empty">Belum ada catatan absensi.</div>}</section>}
+{active === 'Absensi' && (
+  <section className="panel">
+    <div className="panel-head">
+      <div>
+        <h3>Absensi Murid</h3>
+        <p>Kelola dan catat kehadiran murid.</p>
+      </div>
+    </div>
+
+    {isAdmin && (
+      <form
+        onSubmit={saveAttendance}
+        style={{ display: 'grid', gap: 12, marginBottom: 24 }}
+      >
+        <h3>Tambah Absensi</h3>
+
+        <label>
+          Tanggal
+          <input name="date" type="date" required />
+        </label>
+
+        <label>
+          Nama Murid
+          <select name="student_id" required defaultValue="">
+            <option value="">Pilih murid</option>
+            {users.filter(u => u.role === 'murid').map(u => (
+              <option key={u.id} value={u.id}>
+                {u.full_name || u.email}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          NISN
+          <input
+            name="nisn"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]{10}"
+            maxLength={10}
+            placeholder="10 digit NISN"
+            required
+          />
+        </label>
+
+        <label>
+          Kelas
+          <select name="class_id" defaultValue="">
+            <option value="">Pilih kelas (opsional)</option>
+            {classes.map(c => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
+          Status Kehadiran
+          <select name="status" required defaultValue="Hadir">
+            <option value="Hadir">Hadir</option>
+            <option value="Izin">Izin</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Alpa">Alpa</option>
+          </select>
+        </label>
+
+        <label>
+          Catatan
+          <textarea
+            name="note"
+            rows="2"
+            placeholder="Catatan tambahan (opsional)"
+          />
+        </label>
+
+        <button
+          type="submit"
+          className="primary"
+          disabled={uploading}
+        >
+          {uploading ? 'Menyimpan...' : 'Simpan Absensi'}
+        </button>
+      </form>
+    )}
+
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Nama Murid</th>
+            <th>NISN</th>
+            <th>Kelas</th>
+            <th>Status Kehadiran</th>
+            <th>Catatan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {attendance.map(a => (
+            <tr key={a.id}>
+              <td>{a.date}</td>
+              <td>{a.student_name || '-'}</td>
+              <td>{a.nisn || '-'}</td>
+              <td>
+                {classes.find(c => c.id === a.class_id)?.name || '-'}
+              </td>
+              <td><span className="pill">{a.status}</span></td>
+              <td>{a.note || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    {!attendance.length && (
+      <div className="empty">Belum ada catatan absensi.</div>
+    )}
+  </section>
+)}
       {active==='Forum Diskusi'&&<section className="panel"><div className="panel-head"><div><h3>Forum diskusi</h3><p>Berbagi pertanyaan dan berdiskusi</p></div></div>{posts.map(p=><article className="forum-post" key={p.id}><div className="row-icon"><MessageCircle size={18}/></div><div><h3>{p.title}</h3><p>{p.body}</p><small>{new Date(p.created_at).toLocaleString('id-ID')}</small></div></article>)}{!posts.length&&<div className="empty">Belum ada diskusi.</div>}</section>}
       {active==='Laporan Akademik'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Ringkasan akademik</h3><p>Data agregat dari tabel LMS</p></div></div><div className="report-grid"><div><span>Total pengguna</span><b>{summary.users}</b></div><div><span>Total kelas</span><b>{summary.classes}</b></div><div><span>Total tugas</span><b>{summary.assignments}</b></div><div><span>Catatan absensi</span><b>{summary.attendance}</b></div><div><span>Nilai tercatat</span><b>{grades.length}</b></div><div><span>Diskusi</span><b>{posts.length}</b></div></div><button className="secondary" onClick={()=>{const csv='nama,email,peran\\n'+users.map(u=>[u.full_name,u.email,u.role].map(x=>`"${String(x||'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='laporan-pengguna-belajar-bersama.csv';a.click();URL.revokeObjectURL(a.href)}}>Unduh laporan pengguna (CSV)</button></section>}
       {active==='Sertifikat'&&<section className="panel"><div className="panel-head"><div><h3>Sertifikat penyelesaian</h3><p>Sertifikat akan tercatat di sini setelah fitur penerbitan diaktifkan.</p></div></div><div className="empty"><Award size={28}/><b>Belum ada sertifikat</b><span>Admin dapat mengembangkan aturan penerbitan sertifikat berdasarkan penyelesaian kelas dan nilai minimum.</span></div></section>}
