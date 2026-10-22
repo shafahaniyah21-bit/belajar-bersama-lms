@@ -258,7 +258,7 @@ async function deleteCourse(course) {
         student_name: studentName,
         nisn: nisn,
         class_id: classId,
-        status: fd.get('status'),
+        status: String(fd.get('status') || '').trim().toLowerCase(),
         note: fd.get('note') || null,
         recorded_by: session.user.id
       });
