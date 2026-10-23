@@ -26,3 +26,10 @@
 @media(max-width:480px){.assignment-card{grid-template-columns:minmax(0,1fr);gap:10px!important}.assignment-card .row-icon{grid-column:1;grid-row:auto}.assignment-card .assignment-body{grid-column:1;grid-row:auto}.assignment-card>.row-icon+div+div{grid-column:1;grid-row:auto}.assignment-card .assignment-answer-form{padding:12px}.assignment-card .assignment-answer-form .primary{width:100%;justify-self:stretch}}
 
 .student-attendance-form{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:24px}.student-attendance-heading{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.student-attendance-heading h3{margin:0 0 6px}.student-attendance-heading p{margin:0;color:#71829b;font-size:13px}.student-attendance-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:20px}.student-attendance-fields label{display:grid;gap:8px;min-width:0}.student-attendance-fields input,.student-attendance-fields select,.student-attendance-fields textarea{box-sizing:border-box;width:100%;min-width:0;padding:10px;border:1px solid #d7e0ec;border-radius:9px;background:white;color:#233a56}.student-attendance-fields input[readonly]{background:#eef2f7}.student-attendance-form>.primary{min-width:200px}@media(max-width:700px){.student-attendance-fields{grid-template-columns:1fr}.student-attendance-form>.primary{width:100%}}
+
+/* Classroom-inspired enhancements: additive, scoped to classwork pages */
+.classwork-tools{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 20px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px}
+.classwork-tools label{display:grid;gap:6px;flex:1 1 220px;font-size:13px;font-weight:600;color:#334155}
+.classwork-tools input,.classwork-tools select{width:100%;min-height:42px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:9px;background:#fff;padding:9px 12px;font:inherit;color:#1e293b}
+.classwork-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.classwork-meta span{font-size:12px;color:#475569;background:#eef4ff;border-radius:8px;padding:5px 9px}
