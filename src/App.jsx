@@ -399,6 +399,25 @@ async function deleteCourse(course) {
     } catch (err) { setMessage('Gagal membatalkan pengumpulan: ' + err.message); }
     finally { setUploading(false); }
   }
+  async function removeStudentSubmission(submission, assignment) {
+    if (!canManage || uploading || !session?.user?.id) return;
+    if (!isAdmin && assignment.created_by !== session.user.id) {
+      setMessage('Guru hanya dapat mengelola pengumpulan pada tugas yang dibuatnya.');
+      return;
+    }
+    const studentName = users.find(u => u.id === submission.student_id)?.full_name || 'murid ini';
+    if (!window.confirm(`Hapus pengumpulan tugas dari ${studentName}? Murid dapat mengumpulkan ulang. Tindakan ini menghapus catatan pengumpulan, bukan file di penyimpanan.`)) return;
+    setUploading(true);
+    try {
+      const { data, error } = await supabase.from('submissions')
+        .delete().eq('id', submission.id).select('id');
+      if (error) throw error;
+      if (!data?.length) throw new Error('Pengumpulan tidak dapat dihapus. Periksa izin akun.');
+      setMessage('Pengumpulan murid berhasil dihapus. Murid dapat mengumpulkan ulang.');
+      await loadData();
+    } catch (err) { setMessage('Gagal menghapus pengumpulan murid: ' + err.message); }
+    finally { setUploading(false); }
+  }
   async function createPost(e) {
     e.preventDefault(); const fd = new FormData(e.currentTarget);
     const { error } = await supabase.from('forum_posts').insert({ title: fd.get('title'), body: fd.get('body'), author_id: session.user.id });
@@ -532,7 +551,7 @@ async function deleteCourse(course) {
                   {mine && <button type="button" className="secondary" disabled={uploading} onClick={()=>unsubmitAssignment(a.id)} style={{color:'#b42318',borderColor:'#fecdca'}}><Trash2 size={15}/> Batalkan Pengumpulan / Hapus Jawaban</button>}
                  <button className="primary" disabled={uploading}><Upload size={15}/>{uploading?'Mengunggah…':mine?'Perbarui jawaban':'Kumpulkan jawaban'}</button>
                </form>}
-               {canManage && related.length>0 && <div style={{marginTop:12}}><b>Pengumpulan ({related.length})</b>{related.map(s=><div key={s.id} style={{marginTop:8}}><small>Murid: {users.find(u=>u.id===s.student_id)?.full_name || s.student_id}</small>{s.answer_text&&<small>{s.answer_text}</small>}{s.file_url&&<button type="button" className="secondary" onClick={()=>downloadLmsFile(s.file_url)}><Download size={15}/> Unduh jawaban</button>}</div>)}</div>}
+               {canManage && related.length>0 && <div style={{marginTop:12}}><b>Pengumpulan ({related.length})</b>{related.map(s=><div key={s.id} style={{marginTop:8}}><small>Murid: {users.find(u=>u.id===s.student_id)?.full_name || s.student_id}</small>{s.answer_text&&<small>{s.answer_text}</small>}{s.file_url&&<button type="button" className="secondary" onClick={()=>downloadLmsFile(s.file_url)}><Download size={15}/> Unduh jawaban</button>}{(isAdmin || a.created_by === session.user.id) && <button type="button" className="secondary" disabled={uploading} onClick={()=>removeStudentSubmission(s,a)} style={{marginLeft:8,color:'#b42318',borderColor:'#fecdca'}}><Trash2 size={15}/> Batalkan / Hapus Pengumpulan</button>}</div>)}</div>}
              </div>
                            <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8}}>
                 <span className="pill">{a.due_at?`Tenggat ${new Date(a.due_at).toLocaleDateString('id-ID')}`:'Tanpa tenggat'}</span>
