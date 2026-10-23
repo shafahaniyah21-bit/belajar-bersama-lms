@@ -60,3 +60,5 @@
 .classroom-item{display:flex;align-items:center;gap:14px;border-top:1px solid #edf1f6;padding:16px 0}
 .classroom-item>div{flex:1;min-width:0}.classroom-item p{margin:5px 0 0;color:#687d96}
 @media(max-width:750px){.classroom-feed{grid-template-columns:1fr}.classroom-banner{padding:22px}.classroom-banner h2{font-size:25px}.classroom-item{flex-wrap:wrap}}
+
+.classroom-class-card{cursor:default}.classroom-open-button{display:flex;flex-direction:column;align-items:flex-start;gap:12px;width:100%;padding:0;border:0;background:transparent;text-align:left;color:inherit;cursor:pointer;font:inherit}.classroom-open-button strong{font-size:18px}.classroom-open-button small{color:#607997}.classroom-open-button:hover strong{text-decoration:underline}
