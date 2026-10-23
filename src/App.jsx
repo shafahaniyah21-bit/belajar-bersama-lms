@@ -239,7 +239,10 @@ async function deleteCourse(course) {
     const student = users.find(u => u.id === studentId && u.role === 'murid');
     const nisn = String(fd.get('nisn') || '').trim();
     if (!student) { setMessage('Pilih murid yang terdaftar.'); return; }
-    if (!/^\d{10}$/.test(nisn)) { setMessage('NISN harus terdiri dari 10 angka.'); return; }
+    if (!/^\d+$/.test(nisn)) {
+  setMessage('NISN hanya boleh berisi angka.');
+  return;
+}
     const payload = {
       date: fd.get('date'),
       student_id: studentId,
@@ -534,7 +537,7 @@ async function deleteCourse(course) {
         <div className="student-attendance-heading"><div><h3>Isi Absensi Saya</h3><p>Catat kehadiran hari ini menggunakan akunmu sendiri. Data yang tersimpan hanya dapat diubah atau dihapus admin.</p></div><span className="pill">Khusus murid</span></div>
         <div className="student-attendance-fields">
           <label>Nama Murid<input type="text" readOnly value={profile.full_name || session.user.email || 'Murid'} /></label>
-          <label>NISN<input name="nisn" type="text" inputMode="numeric" pattern="[0-9]{10}" maxLength={10} placeholder="Masukkan 10 digit NISN" required /></label>
+          <input name="nisn" type="text" inputMode="numeric" pattern="[0-9]+" placeholder="Masukkan NISN" required /></label>
           
 <label>
   Kelas
