@@ -33,3 +33,30 @@
 .classwork-tools input,.classwork-tools select{width:100%;min-height:42px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:9px;background:#fff;padding:9px 12px;font:inherit;color:#1e293b}
 .classwork-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .classwork-meta span{font-size:12px;color:#475569;background:#eef4ff;border-radius:8px;padding:5px 9px}
+
+/* Additional classroom detail views */
+.classroom-class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin:0 0 22px}
+.classroom-class-card{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:22px;text-align:left;background:white;border:1px solid #dce5f2;border-radius:16px;color:#1e365a;cursor:pointer;min-height:150px}
+.classroom-class-card:hover{border-color:#8eafe7;box-shadow:0 6px 18px #1b3a6310}
+.classroom-class-card strong{font-size:18px}.classroom-class-card small{color:#607997}
+.classroom-class-icon{display:grid;place-items:center;width:42px;height:42px;background:#e7f0ff;color:#3566a8;border-radius:12px}
+.classroom-overlay{position:relative;z-index:2;background:#f4f7fc;margin-top:-4px;padding:0 0 30px}
+.classroom-detail{display:grid;gap:18px}
+.classroom-detail>.secondary{justify-self:start}
+.classroom-banner{background:linear-gradient(110deg,#285f9f,#618ed0);color:white;border-radius:18px;padding:32px 28px}
+.classroom-banner span{font-size:11px;letter-spacing:1.4px;font-weight:700}.classroom-banner h2{font-size:32px;margin:12px 0 6px}.classroom-banner p{margin:0;color:#f0f6ff}
+.classroom-tabs{display:flex;gap:8px;border-bottom:1px solid #dce5f2}
+.classroom-tabs button{background:transparent;border:0;border-bottom:3px solid transparent;padding:14px 18px;color:#536982;cursor:pointer;font-weight:700}
+.classroom-tabs button.selected{color:#245eaa;border-bottom-color:#245eaa}
+.classroom-feed{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:18px;align-items:start}
+.classroom-feed-main{display:grid;gap:16px;min-width:0}
+.classroom-post-form,.classroom-feed-post,.classroom-upcoming{background:#fff;border:1px solid #dce5f2;border-radius:15px;padding:22px}
+.classroom-post-form{display:grid;gap:12px}.classroom-post-form h3,.classroom-feed-post h3{margin:0}
+.classroom-post-form textarea{width:100%;box-sizing:border-box;border:1px solid #ccd8e8;border-radius:10px;padding:12px;font:inherit}
+.classroom-post-form>.primary{justify-self:end}
+.classroom-feed-post{display:grid;gap:8px}.classroom-feed-post small,.classroom-upcoming small{display:block;color:#7b8da5}
+.classroom-feed-post p{white-space:pre-wrap;overflow-wrap:anywhere}
+.classroom-upcoming p{border-top:1px solid #eef2f8;padding-top:12px}
+.classroom-item{display:flex;align-items:center;gap:14px;border-top:1px solid #edf1f6;padding:16px 0}
+.classroom-item>div{flex:1;min-width:0}.classroom-item p{margin:5px 0 0;color:#687d96}
+@media(max-width:750px){.classroom-feed{grid-template-columns:1fr}.classroom-banner{padding:22px}.classroom-banner h2{font-size:25px}.classroom-item{flex-wrap:wrap}}
