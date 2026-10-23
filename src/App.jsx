@@ -383,6 +383,22 @@ async function deleteCourse(course) {
     } catch (err) { setMessage(`Gagal mengumpulkan jawaban: ${err.message}`); }
     finally { setUploading(false); }
   }
+  async function unsubmitAssignment(assignmentId) {
+    if (uploading || canManage || !session?.user?.id) return;
+    const existing = submissions.find(item => item.assignment_id === assignmentId && item.student_id === session.user.id);
+    if (!existing) return;
+    if (!window.confirm('Batalkan pengumpulan tugas ini? Jawaban yang sudah dikirim akan dihapus dari daftar pengumpulan. Kamu bisa mengumpulkan ulang.')) return;
+    setUploading(true);
+    try {
+      const { data, error } = await supabase.from('submissions')
+        .delete().eq('id', existing.id).eq('student_id', session.user.id).select('id');
+      if (error) throw error;
+      if (!data?.length) throw new Error('Tidak ada jawaban yang terhapus. Periksa izin pengumpulan tugas.');
+      setMessage('Pengumpulan berhasil dibatalkan. Kamu dapat mengumpulkan tugas kembali.');
+      await loadData();
+    } catch (err) { setMessage('Gagal membatalkan pengumpulan: ' + err.message); }
+    finally { setUploading(false); }
+  }
   async function createPost(e) {
     e.preventDefault(); const fd = new FormData(e.currentTarget);
     const { error } = await supabase.from('forum_posts').insert({ title: fd.get('title'), body: fd.get('body'), author_id: session.user.id });
@@ -513,6 +529,7 @@ async function deleteCourse(course) {
                  <label>Jawaban tertulis<textarea name="answer_text" rows="3" defaultValue={mine?.answer_text||''} placeholder="Tulis jawaban (opsional jika mengunggah file)"/></label>
                  <label>Unggah file jawaban <span className="assignment-optional">(maks. 20 MB)</span><input name="answer_file" type="file" /></label>
                  {mine?.file_url && <button type="button" className="secondary" onClick={()=>downloadLmsFile(mine.file_url)}><Download size={15}/> Lihat file jawaban saya</button>}
+                  {mine && <button type="button" className="secondary" disabled={uploading} onClick={()=>unsubmitAssignment(a.id)} style={{color:'#b42318',borderColor:'#fecdca'}}><Trash2 size={15}/> Batalkan Pengumpulan / Hapus Jawaban</button>}
                  <button className="primary" disabled={uploading}><Upload size={15}/>{uploading?'Mengunggah…':mine?'Perbarui jawaban':'Kumpulkan jawaban'}</button>
                </form>}
                {canManage && related.length>0 && <div style={{marginTop:12}}><b>Pengumpulan ({related.length})</b>{related.map(s=><div key={s.id} style={{marginTop:8}}><small>Murid: {users.find(u=>u.id===s.student_id)?.full_name || s.student_id}</small>{s.answer_text&&<small>{s.answer_text}</small>}{s.file_url&&<button type="button" className="secondary" onClick={()=>downloadLmsFile(s.file_url)}><Download size={15}/> Unduh jawaban</button>}</div>)}</div>}
