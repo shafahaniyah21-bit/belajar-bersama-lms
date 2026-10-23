@@ -85,6 +85,7 @@ function App() {
   const [attendance, setAttendance] = useState([]);
   const [editingAttendance, setEditingAttendance] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [forumReplies, setForumReplies] = useState([]);
   const [grades, setGrades] = useState([]);
   const [message, setMessage] = useState('');
   const [showCreate, setShowCreate] = useState(false);
@@ -122,7 +123,7 @@ function App() {
 
   async function loadData() {
     if (!supabase) return;
-    const [u,c,co,a,at,p,g,sub] = await Promise.all([
+    const [u,c,co,a,at,p,g,sub,fr] = await Promise.all([
       supabase.from('profiles').select('id,full_name,email,role,created_at').order('created_at',{ascending:false}).limit(100),
       supabase.from('classes').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('courses').select('*').order('created_at',{ascending:false}).limit(100),
@@ -130,10 +131,11 @@ function App() {
       supabase.from('attendance').select('*').order('date',{ascending:false}).limit(100),
       supabase.from('forum_posts').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('grades').select('*').order('created_at',{ascending:false}).limit(100),
-      supabase.from('submissions').select('*').order('submitted_at',{ascending:false}).limit(200)
+      supabase.from('submissions').select('*').order('submitted_at',{ascending:false}).limit(200),
+      supabase.from('forum_replies').select('*').order('created_at',{ascending:true}).limit(500)
     ]);
     setUsers(u.data||[]); setClasses(c.data||[]); setCourses(co.data||[]); setAssignments(a.data||[]);
-    setAttendance(at.data||[]); setPosts(p.data||[]); setGrades(g.data||[]); setSubmissions(sub.data||[]);
+    setAttendance(at.data||[]); setPosts(p.data||[]); setForumReplies(fr.data||[]); setGrades(g.data||[]); setSubmissions(sub.data||[]);
     setSummary({users:u.data?.length||0,classes:c.data?.length||0,assignments:a.data?.length||0,attendance:at.data?.length||0});
   }
 
@@ -463,6 +465,37 @@ async function deleteCourse(course) {
     const { error } = await supabase.from('forum_posts').insert({ title: fd.get('title'), body: fd.get('body'), class_id: fd.get('class_id') || null, author_id: session.user.id });
     if (error) setMessage(error.message); else { setMessage('Diskusi berhasil dipublikasikan.'); setShowCreate(false); loadData(); }
   }
+  async function replyToClassPost(e, postId) {
+    e.preventDefault();
+    if (!session?.user?.id || uploading) return;
+    const form=e.currentTarget;
+    const body=String(new FormData(form).get('reply')||'').trim();
+    if (!body) return;
+    setUploading(true);
+    try {
+      const {error}=await supabase.from('forum_replies').insert({post_id:postId,author_id:session.user.id,body});
+      if(error)throw error;
+      form.reset();
+      setMessage('Balasan berhasil dikirim.');
+      await loadData();
+    }catch(err){setMessage('Gagal mengirim balasan: '+err.message);}
+    finally{setUploading(false);}
+  }
+  async function deleteClassDiscussion(kind, item) {
+    if (!session?.user?.id || uploading || !(isAdmin || item.author_id===session.user.id)) return;
+    const isReply=kind==='reply';
+    if(!window.confirm(isReply?'Hapus balasan ini?':'Hapus postingan diskusi ini beserta seluruh balasannya?'))return;
+    setUploading(true);
+    try {
+      const table=isReply?'forum_replies':'forum_posts';
+      const {data,error}=await supabase.from(table).delete().eq('id',item.id).select('id');
+      if(error)throw error;
+      if(!data?.length)throw new Error('Tidak memiliki izin menghapus komentar ini.');
+      setMessage(isReply?'Balasan berhasil dihapus.':'Postingan diskusi berhasil dihapus.');
+      await loadData();
+    }catch(err){setMessage('Gagal menghapus: '+err.message);}
+    finally{setUploading(false);}
+  }
   async function changeRole(id, role) {
     const { error } = await supabase.from('profiles').update({role}).eq('id',id);
     setMessage(error ? error.message : 'Peran pengguna diperbarui.'); if (!error) loadData();
@@ -546,7 +579,14 @@ async function deleteCourse(course) {
       {active==='Kelas & Materi' && openedClass && <div className="classroom-overlay"><section className="classroom-detail"><button className="secondary" type="button" onClick={()=>setOpenedClassId(null)}>← Kembali ke semua kelas</button><div className="classroom-banner"><span>RUANG KELAS · BELAJAR BERSAMA</span><h2>{openedClass.name}</h2><p>Materi, tugas, pengumuman, dan diskusi kelas.</p></div>{canManage && <button type="button" className="primary" style={{justifySelf:'start'}} onClick={()=>{setCreateKind('material');setShowCreate(true)}}><Plus size={16}/> Tambah Materi ke Kelas Ini</button>}<div className="classroom-tabs">{[['stream','Beranda'],['materi','Materi'],['diskusi','Diskusi']].map(([key,label])=><button type="button" key={key} className={classTab===key?'selected':''} onClick={()=>setClassTab(key)}>{label}</button>)}</div>
         {classTab==='stream' && <div className="classroom-feed"><div className="classroom-feed-main">{canManage && <form className="classroom-post-form" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const fd=new FormData(form);const body=String(fd.get('body')||'').trim();if(!body)return;setUploading(true);const {error}=await supabase.from('forum_posts').insert({title:'Pengumuman kelas',body,class_id:openedClass.id,author_id:session.user.id});setUploading(false);if(error)setMessage('Gagal membuat pengumuman: '+error.message);else{form.reset();setMessage('Pengumuman berhasil diposting.');await loadData();}}}><h3>Buat pengumuman kelas</h3><textarea name="body" required rows="3" placeholder="Tulis pengumuman untuk kelas ini…"/><button className="primary" disabled={uploading}>Posting pengumuman</button></form>}{posts.filter(p=>p.class_id===openedClass.id).map(p=><article key={p.id} className="classroom-feed-post"><b>{users.find(u=>u.id===p.author_id)?.full_name||'Pengguna'}</b><small>{p.created_at?new Date(p.created_at).toLocaleString('id-ID'):''}</small><h3>{p.title}</h3><p>{p.body}</p></article>)}{!posts.some(p=>p.class_id===openedClass.id)&&<div className="panel empty">Belum ada pengumuman. Mulai diskusi melalui tab Diskusi.</div>}</div><aside className="classroom-upcoming"><h3>Tugas kelas</h3><p className="classroom-reminder-intro">Pengingat tugas untuk murid di kelas ini.</p>{assignments.filter(a=>a.class_id===openedClass.id).sort((a,b)=>(a.due_at?new Date(a.due_at).getTime():Infinity)-(b.due_at?new Date(b.due_at).getTime():Infinity)).slice(0,5).map(a=><div className="classroom-reminder" key={a.id}><strong>{a.title}</strong><small>{a.due_at?'Tenggat: '+new Date(a.due_at).toLocaleString('id-ID'):'Tanpa tenggat'}</small><button type="button" className="secondary" onClick={()=>{setClassworkSearch(a.title);setClassworkFilter('semua');setActive('Tugas & Kuis');setOpenedClassId(null)}}>Lihat tugas →</button></div>)}{!assignments.some(a=>a.class_id===openedClass.id)&&<p>Belum ada tugas untuk kelas ini.</p>}</aside></div>}
         {classTab==='materi' && <div className="classroom-feed-main"><div className="classroom-feed-post"><h3>Materi kelas</h3>{courses.filter(c=>c.class_id===openedClass.id).map(c=><div key={c.id} className="classroom-item"><BookOpen size={20}/><div><b>{c.title}</b><p>{c.description||'Materi pembelajaran'}</p></div>{c.attachment_path&&<button className="secondary" onClick={()=>downloadLmsFile(c.attachment_path)}>Unduh</button>}{canManage&&(isAdmin||c.created_by===session.user.id)&&<button type="button" className="secondary" disabled={uploading} onClick={()=>deleteCourse(c)} style={{color:'#b42318',borderColor:'#fecdca'}}>Hapus materi</button>}</div>)}{!courses.some(c=>c.class_id===openedClass.id)&&<p>Belum ada materi yang ditautkan ke kelas ini.</p>}</div></div>}
-        {classTab==='diskusi' && <div className="classroom-feed-main"><form className="classroom-post-form" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const fd=new FormData(form);const body=String(fd.get('body')||'').trim();if(!body)return;setUploading(true);const {error}=await supabase.from('forum_posts').insert({title:'Diskusi kelas',body,class_id:openedClass.id,author_id:session.user.id});setUploading(false);if(error)setMessage('Gagal mengirim komentar: '+error.message);else{form.reset();setMessage('Komentar berhasil dikirim.');await loadData();}}}><h3>Ruang diskusi {openedClass.name}</h3><p>Guru dan murid dapat bertanya, berbagi pendapat, dan berdiskusi.</p><textarea name="body" rows="3" required placeholder="Tulis komentar atau pertanyaan…"/><button className="primary" disabled={uploading}>Kirim komentar</button></form>{posts.filter(p=>p.class_id===openedClass.id).map(p=><article className="classroom-feed-post" key={p.id}><b>{users.find(u=>u.id===p.author_id)?.full_name||'Pengguna'}</b><small>{p.created_at?new Date(p.created_at).toLocaleString('id-ID'):''}</small><p>{p.body}</p></article>)}{!posts.some(p=>p.class_id===openedClass.id)&&<div className="panel empty">Belum ada komentar di kelas ini.</div>}</div>}
+        {classTab==='diskusi' && <div className="classroom-feed-main"><form className="classroom-post-form" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const fd=new FormData(form);const body=String(fd.get('body')||'').trim();if(!body)return;setUploading(true);const {error}=await supabase.from('forum_posts').insert({title:'Diskusi kelas',body,class_id:openedClass.id,author_id:session.user.id});setUploading(false);if(error)setMessage('Gagal mengirim komentar: '+error.message);else{form.reset();setMessage('Komentar berhasil dikirim.');await loadData();}}}><h3>Ruang diskusi {openedClass.name}</h3><p>Guru dan murid dapat bertanya, berbagi pendapat, dan berdiskusi.</p><textarea name="body" rows="3" required placeholder="Tulis komentar atau pertanyaan…"/><button className="primary" disabled={uploading}>Kirim komentar</button></form>{posts.filter(p=>p.class_id===openedClass.id).map(p=><article className="classroom-feed-post" key={p.id}>
+          <div className="classroom-post-header"><div><b>{users.find(u=>u.id===p.author_id)?.full_name||'Pengguna'}</b><small>{p.created_at?new Date(p.created_at).toLocaleString('id-ID'):''}</small></div>{(isAdmin||p.author_id===session.user.id)&&<button type="button" className="secondary classroom-delete-button" disabled={uploading} onClick={()=>deleteClassDiscussion('post',p)}><Trash2 size={14}/> Hapus postingan</button>}</div>
+          <p>{p.body}</p>
+          <div className="classroom-replies"><h4>Balasan ({forumReplies.filter(reply=>reply.post_id===p.id).length})</h4>
+          {forumReplies.filter(reply=>reply.post_id===p.id).map(reply=><div className="classroom-reply" key={reply.id}><div className="classroom-post-header"><div><b>{users.find(u=>u.id===reply.author_id)?.full_name||'Pengguna'}</b><small>{reply.created_at?new Date(reply.created_at).toLocaleString('id-ID'):''}</small></div>{(isAdmin||reply.author_id===session.user.id)&&<button type="button" className="secondary classroom-delete-button" disabled={uploading} onClick={()=>deleteClassDiscussion('reply',reply)}><Trash2 size={14}/> Hapus</button>}</div><p>{reply.body}</p></div>)}
+          <form className="classroom-reply-form" onSubmit={e=>replyToClassPost(e,p.id)}><textarea name="reply" rows="2" required maxLength={4000} placeholder="Tulis balasan untuk postingan ini…"/><button type="submit" className="primary" disabled={uploading}>Kirim balasan</button></form>
+          </div>
+        </article>)}{!posts.some(p=>p.class_id===openedClass.id)&&<div className="panel empty">Belum ada komentar di kelas ini.</div>}</div>}
       </section></div>}
       {active==='Pengguna'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Manajemen pengguna</h3><p>Atur peran pengguna yang sudah terdaftar</p></div><div className="searchbox"><Search size={16}/><input placeholder="Cari nama atau email…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Pengguna</th><th>Email</th><th>Peran</th><th>Terdaftar</th></tr></thead><tbody>{filteredUsers.map(u=><tr key={u.id}><td><b>{u.full_name||'—'}</b></td><td>{u.email||'—'}</td><td><select value={u.role} disabled={u.id===session.user.id} onChange={e=>changeRole(u.id,e.target.value)}><option value="murid">Murid</option><option value="guru">Guru</option><option value="admin">Admin</option></select></td><td>{u.created_at?new Date(u.created_at).toLocaleDateString('id-ID'):'—'}</td></tr>)}</tbody></table></div><p className="hint">Perubahan peran dibatasi oleh kebijakan database. Akun Admin utama sebaiknya tidak diturunkan perannya.</p></section>}
       {active==='Kelas & Materi'&&!openedClass&&<><div className="section-head"><h3>Daftar kelas</h3><span>{classes.length} kelas</span></div><div className="classroom-class-grid">{classes.map(c=><div key={c.id} className="classroom-class-card"><button type="button" className="classroom-open-button" onClick={()=>{setOpenedClassId(c.id);setClassTab('stream')}}><span className="classroom-class-icon"><BookOpen size={24}/></span><strong>{c.name}</strong><small>Buka ruang kelas →</small></button>{canManage&&(isAdmin||c.teacher_id===session.user.id)&&<button type="button" className="secondary" disabled={uploading} onClick={()=>deleteClass(c)} style={{color:'#b42318',borderColor:'#fecdca',marginTop:12}}><Trash2 size={15}/> Hapus Kelas</button>}</div>)}</div></>}
