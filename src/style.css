@@ -65,3 +65,14 @@
 
 /* Classroom assignment reminders, linked to the existing Tugas & Kuis page */
 .classroom-reminder-intro{font-size:12px;color:#6b7f98}.classroom-reminder{display:grid;gap:8px;padding:13px 0;border-top:1px solid #e8eef7}.classroom-reminder strong{font-size:14px;overflow-wrap:anywhere}.classroom-reminder small{font-size:12px}.classroom-reminder .secondary{justify-self:start;font-size:12px;padding:7px 10px}
+
+/* Threaded replies and moderation inside each classroom discussion post */
+.classroom-post-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.classroom-delete-button{color:#b42318!important;border-color:#fecdca!important;font-size:12px;padding:7px 10px;display:inline-flex;align-items:center;gap:5px}
+.classroom-replies{display:grid;gap:12px;margin-top:12px;padding-top:16px;border-top:1px solid #e7edf6}
+.classroom-replies h4{font-size:13px;color:#536982;margin:0}
+.classroom-reply{background:#f5f8fd;border:1px solid #e4ebf5;border-radius:12px;padding:13px}
+.classroom-reply p{margin:9px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.classroom-reply-form{display:grid;gap:10px}
+.classroom-reply-form textarea{width:100%;box-sizing:border-box;border:1px solid #ccd8e8;border-radius:10px;padding:11px;font:inherit}
+.classroom-reply-form .primary{justify-self:end}
