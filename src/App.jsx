@@ -277,7 +277,7 @@ async function deleteCourse(course) {
     const localDate = [today.getFullYear(), String(today.getMonth()+1).padStart(2,'0'), String(today.getDate()).padStart(2,'0')].join('-');
     const nisn = String(fd.get('nisn') || '').trim();
     const status = String(fd.get('status') || '');
-    if (!/^\\d{10}$/.test(nisn)) { setMessage('NISN harus terdiri dari 10 angka.'); return; }
+    if (!/^[0-9]+$/.test(nisn)) { setMessage('NISN hanya boleh berisi angka.'); return; }
     if (!['hadir','izin','sakit'].includes(status)) { setMessage('Pilih status kehadiran yang valid.'); return; }
     if (attendance.some(a => a.student_id === session.user.id && a.date === localDate)) {
       setMessage('Absensi hari ini sudah tercatat. Hubungi admin jika perlu koreksi.');
