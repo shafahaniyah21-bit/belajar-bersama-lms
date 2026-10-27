@@ -277,7 +277,7 @@ async function deleteCourse(course) {
 
   async function saveAttendance(e) {
     e.preventDefault();
-    if (!isAdmin || uploading) return;
+    if (!canManage || uploading) return;
     const form = e.currentTarget;
     const fd = new FormData(form);
     const studentId = String(fd.get('student_id') || '');
@@ -653,7 +653,7 @@ async function deleteCourse(course) {
         </button>
       </form>
     )}
-    {isAdmin && (
+    {canManage && (
       <form key={editingAttendance?.id || 'new'} onSubmit={saveAttendance}
         style={{background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:16, padding:20, marginBottom:24}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,marginBottom:18,flexWrap:'wrap'}}>
@@ -672,8 +672,8 @@ async function deleteCourse(course) {
             </select>
           </label>
           <label style={{display:'grid',gap:7}}>NISN
-            <input style={{width:'100%',boxSizing:'border-box'}} name="nisn" type="text" inputMode="numeric" pattern="[0-9]{10}"
-              maxLength={10} placeholder="10 digit NISN" required defaultValue={editingAttendance?.nisn || ''}/>
+            <input style={{width:'100%',boxSizing:'border-box'}} name="nisn" type="text" inputMode="numeric" pattern="[0-9]+"
+              placeholder="Masukkan NISN" required defaultValue={editingAttendance?.nisn || ''}/>
           </label>
           <label style={{display:'grid',gap:7}}>Kelas
             <select style={{width:'100%',boxSizing:'border-box'}} name="class_id" defaultValue={editingAttendance?.class_id || ''}>
@@ -702,7 +702,7 @@ async function deleteCourse(course) {
     )}
     <div className="table-wrap" style={{border:'1px solid #e2e8f0',borderRadius:12,overflowX:'auto'}}>
       <table style={{width:'100%',borderCollapse:'collapse',minWidth:800}}>
-        <thead><tr><th>Tanggal</th><th>Nama Murid</th><th>NISN</th><th>Kelas</th><th>Status</th><th>Catatan</th>{isAdmin&&<th>Aksi</th>}</tr></thead>
+        <thead><tr><th>Tanggal</th><th>Nama Murid</th><th>NISN</th><th>Kelas</th><th>Status</th><th>Catatan</th>{canManage&&<th>Aksi</th>}</tr></thead>
         <tbody>{attendance.map(a=><tr key={a.id}>
           <td>{a.date ? new Date(`${a.date}T00:00:00`).toLocaleDateString('id-ID') : '-'}</td>
           <td><b>{a.student_name || users.find(u=>u.id===a.student_id)?.full_name || '-'}</b></td>
@@ -710,7 +710,7 @@ async function deleteCourse(course) {
           <td>{classes.find(c=>c.id===a.class_id)?.name || '-'}</td>
           <td><span className="pill">{({hadir:'Hadir',izin:'Izin',sakit:'Sakit',alpa:'Alpa'})[a.status] || a.status}</span></td>
           <td>{a.note || '-'}</td>
-          {isAdmin&&<td><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+          {canManage&&<td><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
             <button type="button" className="secondary" disabled={uploading} onClick={()=>{setEditingAttendance(a);setMessage('');window.scrollTo({top:0,behavior:'smooth'});}}>Edit</button>
             <button type="button" className="secondary" disabled={uploading} style={{color:'#b42318',borderColor:'#fecdca'}} onClick={()=>deleteAttendance(a)}><Trash2 size={14}/> Hapus</button>
           </div></td>}
