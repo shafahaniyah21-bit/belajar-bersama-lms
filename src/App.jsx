@@ -504,7 +504,7 @@ async function deleteCourse(course) {
   async function deleteRegisteredUser(user) {
     if (!isAdmin || uploading || !user?.id || user.id === session.user.id) return;
     const name = user.full_name || user.email || 'pengguna ini';
-    if (!window.confirm(`Hapus akun "${name}" secara permanen? Pengguna tidak akan bisa login lagi. Data pribadinya seperti absensi, nilai, dan pengumpulan tugas akan ikut terhapus. Materi dan tugas yang dibuatnya akan dipertahankan dan dialihkan ke akun admin kamu. Tindakan ini tidak dapat dibatalkan.`)) return;
+    if (!window.confirm(`Hapus akun "${name}" secara permanen? Pengguna tidak akan bisa login lagi. Data absensi, nilai, pengumpulan tugas, serta postingan dan komentar yang ditulis akun tersebut dapat ikut terhapus. Materi dan tugas yang dibuatnya akan dipertahankan dan dialihkan ke akun admin kamu. Tindakan ini tidak dapat dibatalkan.`)) return;
     setUploading(true);
     try {
       const { data, error } = await supabase.functions.invoke('delete-user', {
