@@ -63,6 +63,16 @@ Deno.serve(async (req: Request) => {
       if ((count || 0) <= 1) return json({ error: "Admin terakhir tidak boleh dihapus." }, 400);
     }
 
+    // Allow a retry to clean an orphan profile even if its Auth user was already deleted.
+    const { data: targetAuthData, error: targetAuthLookupError } =
+      await adminClient.auth.admin.getUserById(targetId);
+    const authUserAlreadyMissing =
+      Boolean(targetAuthLookupError && /not found|does not exist|user not found/i.test(targetAuthLookupError.message));
+    if (targetAuthLookupError && !authUserAlreadyMissing) {
+      return json({ error: "Gagal memeriksa akun login target: " + targetAuthLookupError.message }, 500);
+    }
+    const authUserExists = Boolean(targetAuthData?.user);
+
     // Keep teaching content that would otherwise block account deletion by foreign-key constraints.
     // Existing courses, assignments and quizzes authored by this account are reassigned to the requesting admin.
     for (const table of ["courses", "assignments", "quizzes"]) {
@@ -72,12 +82,14 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetId);
-    if (deleteError) return json({ error: "Supabase gagal menghapus akun: " + deleteError.message }, 500);
+    if (authUserExists) {
+      const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetId);
+      if (deleteError) return json({ error: "Supabase gagal menghapus akun: " + deleteError.message }, 500);
+    }
 
     // Explicitly remove any orphan profile row in projects where the auth.users
     // foreign-key cascade was not installed or the schema was changed manually.
-    // With a configured ON DELETE CASCADE this is simply a no-op.
+    // This also lets admin retry cleanup for previously deleted Auth users.
     const { error: profileDeleteError } = await adminClient
       .from("profiles").delete().eq("id", targetId);
     if (profileDeleteError) {
