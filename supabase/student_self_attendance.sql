@@ -1,20 +1,38 @@
 -- Jalankan SATU KALI di Supabase SQL Editor untuk mengaktifkan absensi mandiri.
 -- Data absensi lama tidak dihapus. Admin tetap dapat mengedit dan menghapus.
--- Guru dan murid tidak dapat mengedit atau menghapus absensi.
+-- Admin dan guru dapat membuat/mengedit/mengelola absensi. Murid hanya dapat mengisi absensinya sendiri.
 begin;
 create or replace function public.has_attendance_today(p_student_id uuid)
 returns boolean language sql stable security definer set search_path = ''
 as $$ select exists(select 1 from public.attendance a where a.student_id = p_student_id and a.date = (now() at time zone 'Asia/Jakarta')::date); $$;
 revoke all on function public.has_attendance_today(uuid) from public;
 grant execute on function public.has_attendance_today(uuid) to authenticated;
+create or replace function public.can_manage_attendance()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $
+  select exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role in ('admin', 'guru')
+  );
+$;
+revoke all on function public.can_manage_attendance() from public;
+grant execute on function public.can_manage_attendance() to authenticated;
+
 drop policy if exists "staff manages attendance" on public.attendance;
 drop policy if exists "admin manages attendance" on public.attendance;
+drop policy if exists "teacher manages attendance" on public.attendance;
 drop policy if exists "student inserts own attendance" on public.attendance;
 
-create policy "admin manages attendance"
+create policy "staff manages attendance"
 on public.attendance for all to authenticated
-using (public.is_admin())
-with check (public.is_admin());
+using (public.can_manage_attendance())
+with check (public.can_manage_attendance());
 
 create policy "student inserts own attendance"
 on public.attendance for insert to authenticated
