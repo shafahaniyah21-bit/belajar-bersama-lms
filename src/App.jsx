@@ -501,6 +501,33 @@ async function deleteCourse(course) {
     }catch(err){setMessage('Gagal menghapus: '+err.message);}
     finally{setUploading(false);}
   }
+  async function deleteRegisteredUser(user) {
+    if (!isAdmin || uploading || !user?.id || user.id === session.user.id) return;
+    const name = user.full_name || user.email || 'pengguna ini';
+    if (!window.confirm(`Hapus akun "${name}" secara permanen? Pengguna tidak akan bisa login lagi. Data pribadinya seperti absensi, nilai, dan pengumpulan tugas akan ikut terhapus. Materi dan tugas yang dibuatnya akan dipertahankan dan dialihkan ke akun admin kamu. Tindakan ini tidak dapat dibatalkan.`)) return;
+    setUploading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { userId: user.id }
+      });
+      if (error) {
+        let detail = error.message || 'Permintaan gagal.';
+        try {
+          const body = await error.context?.json?.();
+          if (body?.error) detail = body.error;
+        } catch {}
+        throw new Error(detail + ' Pastikan fungsi delete-user sudah dipasang di Supabase.');
+      }
+      if (data?.error) throw new Error(data.error);
+      setMessage('Akun ' + name + ' berhasil dihapus.');
+      await loadData();
+    } catch (err) {
+      setMessage('Gagal menghapus pengguna: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function changeRole(id, role) {
     const { error } = await supabase.from('profiles').update({role}).eq('id',id);
     setMessage(error ? error.message : 'Peran pengguna diperbarui.'); if (!error) loadData();
@@ -593,7 +620,7 @@ async function deleteCourse(course) {
           </div>
         </article>)}{!posts.some(p=>p.class_id===openedClass.id)&&<div className="panel empty">Belum ada komentar di kelas ini.</div>}</div>}
       </section></div>}
-      {active==='Pengguna'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Manajemen pengguna</h3><p>Atur peran pengguna yang sudah terdaftar</p></div><div className="searchbox"><Search size={16}/><input placeholder="Cari nama atau email…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Pengguna</th><th>Email</th><th>Peran</th><th>Terdaftar</th></tr></thead><tbody>{filteredUsers.map(u=><tr key={u.id}><td><b>{u.full_name||'—'}</b></td><td>{u.email||'—'}</td><td><select value={u.role} disabled={u.id===session.user.id} onChange={e=>changeRole(u.id,e.target.value)}><option value="murid">Murid</option><option value="guru">Guru</option><option value="admin">Admin</option></select></td><td>{u.created_at?new Date(u.created_at).toLocaleDateString('id-ID'):'—'}</td></tr>)}</tbody></table></div><p className="hint">Perubahan peran dibatasi oleh kebijakan database. Akun Admin utama sebaiknya tidak diturunkan perannya.</p></section>}
+      {active==='Pengguna'&&isAdmin&&<section className="panel"><div className="panel-head"><div><h3>Manajemen pengguna</h3><p>Atur peran atau hapus akun yang sudah terdaftar</p></div><div className="searchbox"><Search size={16}/><input placeholder="Cari nama atau email…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Pengguna</th><th>Email</th><th>Peran</th><th>Terdaftar</th><th>Aksi</th></tr></thead><tbody>{filteredUsers.map(u=><tr key={u.id}><td><b>{u.full_name||'—'}</b>{u.id===session.user.id&&<small style={{display:'block',color:'#64748b'}}>Akun kamu</small>}</td><td>{u.email||'—'}</td><td><select value={u.role} disabled={u.id===session.user.id} onChange={e=>changeRole(u.id,e.target.value)}><option value="murid">Murid</option><option value="guru">Guru</option><option value="admin">Admin</option></select></td><td>{u.created_at?new Date(u.created_at).toLocaleDateString('id-ID'):'—'}</td><td><button type="button" className="secondary" disabled={uploading||u.id===session.user.id} onClick={()=>deleteRegisteredUser(u)} style={{color:'#b42318',borderColor:'#fecdca',whiteSpace:'nowrap'}}><Trash2 size={14}/> Hapus pengguna</button></td></tr>)}</tbody></table></div><p className="hint">Hanya admin yang bisa menghapus akun. Akun yang sedang digunakan tidak bisa dihapus dari sini, dan akun admin terakhir dilindungi.</p></section>}
       {active==='Kelas & Materi'&&!openedClass&&<><div className="section-head"><h3>Daftar kelas</h3><span>{classes.length} kelas</span></div><div className="classroom-class-grid">{classes.map(c=><div key={c.id} className="classroom-class-card"><button type="button" className="classroom-open-button" onClick={()=>{setOpenedClassId(c.id);setClassTab('stream')}}><span className="classroom-class-icon"><BookOpen size={24}/></span><strong>{c.name}</strong><small>Buka ruang kelas →</small></button>{canManage&&(isAdmin||c.teacher_id===session.user.id)&&<button type="button" className="secondary" disabled={uploading} onClick={()=>deleteClass(c)} style={{color:'#b42318',borderColor:'#fecdca',marginTop:12}}><Trash2 size={15}/> Hapus Kelas</button>}</div>)}</div></>}
              {active==='Tugas & Kuis'&&<section className="panel"><div className="panel-head"><div><h3>Daftar tugas</h3><p>Tugas dan kuis pembelajaran</p></div></div><div className="classwork-tools"><label>Cari tugas<input value={classworkSearch} onChange={e=>setClassworkSearch(e.target.value)} placeholder="Cari judul atau instruksi…" /></label><label>Tampilkan<select value={classworkFilter} onChange={e=>setClassworkFilter(e.target.value)}><option value="semua">Semua tugas</option><option value="belum">Belum dikumpulkan</option><option value="terkumpul">Sudah dikumpulkan</option><option value="terlambat">Lewat tenggat</option></select></label></div>
          {assignments.filter(a => { const mine = submissions.find(s => s.assignment_id === a.id && s.student_id === session.user.id); const late = a.due_at && new Date(a.due_at).getTime() < Date.now(); const match = (a.title + ' ' + (a.description || '')).toLowerCase().includes(classworkSearch.toLowerCase()); return match && (classworkFilter === 'semua' || (classworkFilter === 'belum' && !mine) || (classworkFilter === 'terkumpul' && !!mine) || (classworkFilter === 'terlambat' && late && !mine)); }).map(a => {
