@@ -280,10 +280,15 @@ async function deleteCourse(course) {
     if (!canManage || uploading) return;
     const form = e.currentTarget;
     const fd = new FormData(form);
-    const studentId = String(fd.get('student_id') || '');
-    const student = users.find(u => u.id === studentId && u.role === 'murid');
+    const typedStudentName = String(fd.get('student_name') || '').trim();
+    const normalizedStudentName = typedStudentName.toLocaleLowerCase('id-ID');
+    const matchingStudents = users.filter(u => u.role === 'murid' &&
+      String(u.full_name || '').trim().toLocaleLowerCase('id-ID') === normalizedStudentName);
+    const student = matchingStudents.length === 1 ? matchingStudents[0] : null;
     const nisn = String(fd.get('nisn') || '').trim();
-    if (!student) { setMessage('Pilih murid yang terdaftar.'); return; }
+    if (!typedStudentName) { setMessage('Nama murid harus diisi.'); return; }
+    if (matchingStudents.length > 1) { setMessage('Ada beberapa murid dengan nama yang sama. Gunakan nama lengkap yang berbeda atau ubah nama profil murid terlebih dahulu.'); return; }
+    if (!student) { setMessage('Nama harus sesuai dengan nama akun murid yang sudah terdaftar di LMS.'); return; }
     if (!/^\d+$/.test(nisn)) {
   setMessage('NISN hanya boleh berisi angka.');
   return;
@@ -666,10 +671,9 @@ async function deleteCourse(course) {
             <input style={{width:'100%',boxSizing:'border-box'}} name="date" type="date" required defaultValue={editingAttendance?.date || ''}/>
           </label>
           <label style={{display:'grid',gap:7}}>Nama Murid
-            <select style={{width:'100%',boxSizing:'border-box'}} name="student_id" required defaultValue={editingAttendance?.student_id || ''}>
-              <option value="">Pilih murid</option>
-              {users.filter(u=>u.role==='murid').map(u=><option key={u.id} value={u.id}>{u.full_name || u.email}</option>)}
-            </select>
+            <input style={{width:'100%',boxSizing:'border-box'}} name="student_name" type="text" required
+              placeholder="Ketik nama lengkap murid yang terdaftar"
+              defaultValue={editingAttendance?.student_name || users.find(u=>u.id===editingAttendance?.student_id)?.full_name || ''}/>
           </label>
           <label style={{display:'grid',gap:7}}>NISN
             <input style={{width:'100%',boxSizing:'border-box'}} name="nisn" type="text" inputMode="numeric" pattern="[0-9]+"
