@@ -20,7 +20,7 @@ as $
     where p.id = auth.uid()
       and p.role in ('admin', 'guru')
   );
-$;
+$function$;
 revoke all on function public.can_manage_attendance() from public;
 grant execute on function public.can_manage_attendance() to authenticated;
 
@@ -39,7 +39,7 @@ on public.attendance for insert to authenticated
 with check (
   student_id = auth.uid()
   and recorded_by = auth.uid()
-  and class_id is null
+  and (class_id is null or exists (select 1 from public.classes c where c.id = class_id))
   and date = (now() at time zone 'Asia/Jakarta')::date
   and status in ('hadir','izin','sakit')
   and exists (
