@@ -75,6 +75,17 @@ Deno.serve(async (req: Request) => {
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetId);
     if (deleteError) return json({ error: "Supabase gagal menghapus akun: " + deleteError.message }, 500);
 
+    // Explicitly remove any orphan profile row in projects where the auth.users
+    // foreign-key cascade was not installed or the schema was changed manually.
+    // With a configured ON DELETE CASCADE this is simply a no-op.
+    const { error: profileDeleteError } = await adminClient
+      .from("profiles").delete().eq("id", targetId);
+    if (profileDeleteError) {
+      return json({
+        error: "Akun login sudah dihapus, tetapi pembersihan profil gagal: " + profileDeleteError.message,
+      }, 500);
+    }
+
     return json({
       success: true,
       message: "Akun berhasil dihapus. Materi dan tugas yang dibuat akun tersebut dipertahankan dan dialihkan kepada admin.",
