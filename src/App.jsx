@@ -712,7 +712,7 @@ async function deleteCourse(course) {
           <td>{a.note || '-'}</td>
           {canManage&&<td><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
             <button type="button" className="secondary" disabled={uploading} onClick={()=>{setEditingAttendance(a);setMessage('');window.scrollTo({top:0,behavior:'smooth'});}}>Edit</button>
-            <button type="button" className="secondary" disabled={uploading} style={{color:'#b42318',borderColor:'#fecdca'}} onClick={()=>deleteAttendance(a)}><Trash2 size={14}/> Hapus</button>
+            {isAdmin&&<button type="button" className="secondary" disabled={uploading} style={{color:'#b42318',borderColor:'#fecdca'}} onClick={()=>deleteAttendance(a)}><Trash2 size={14}/> Hapus</button>}
           </div></td>}
         </tr>)}</tbody>
       </table>
