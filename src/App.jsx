@@ -521,6 +521,11 @@ async function deleteCourse(course) {
       if (data?.error) throw new Error(data.error);
       setMessage('Akun ' + name + ' berhasil dihapus.');
       await loadData();
+      setUsers(current => {
+        const remaining = current.filter(item => item.id !== user.id);
+        setSummary(previous => ({ ...previous, users: remaining.length }));
+        return remaining;
+      });
     } catch (err) {
       setMessage('Gagal menghapus pengguna: ' + err.message);
     } finally {
