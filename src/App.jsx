@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import Notifications from './Notifications';
 import {
-  GraduationCap, Cloud, LayoutDashboard, Users, BookOpen, ClipboardCheck,
+  GraduationCap, Cloud, Home, LayoutDashboard, Users, BookOpen, ClipboardCheck,
   FileText, BarChart3, MessageCircle, Award, Settings, LogOut, Menu,
   Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X, Upload, Download, Trash2, UserRound, KeyRound, ChevronDown
 } from 'lucide-react';
@@ -599,7 +599,7 @@ async function deleteCourse(course) {
       <div className="sidebar-bottom"><button type="button" className="mini-profile" onClick={()=>setSidebarMenuOpen(open=>!open)} aria-expanded={sidebarMenuOpen} aria-controls="sidebar-menu-list" title={sidebarMenuOpen?'Tutup Menu Utama':'Buka Menu Utama'} style={{width:'100%',border:0,background:'transparent',textAlign:'left',cursor:'pointer',display:'flex',alignItems:'center',gap:10,padding:0,color:'inherit'}}><div className="avatar">{(profile.full_name||session.user.email||'U').slice(0,1).toUpperCase()}</div><div className="profile-text" style={{flex:1,minWidth:0}}><b>{profile.full_name||'Pengguna'}</b><small>{profile.role}</small></div><ChevronDown size={17} style={{flexShrink:0,transform:sidebarMenuOpen?'rotate(0deg)':'rotate(-90deg)',transition:'transform .2s ease'}}/></button></div>
     </aside>
     {mobileNav&&<div className="scrim" onClick={()=>setMobileNav(false)}/>}
-    <main className="main"><header className="topbar"><button className="icon-button mobile-menu" onClick={()=>setMobileNav(!mobileNav)}><Menu/></button><div className="breadcrumb">Fun Learning Adventure <span>/</span> <b>{pageTitle}</b></div><div className="top-actions"><Notifications supabase={supabase} userId={session.user.id} role={profile.role} onNavigate={(page)=>{setActive(page);setProfileMenuOpen(false);}}/><div style={{position:'relative'}}>
+    <main className="main"><header className="topbar"><button className="icon-button mobile-menu" onClick={()=>setMobileNav(!mobileNav)}><Menu/></button><div className="breadcrumb"><Home size={20} strokeWidth={2}/><span>Fun Learning Adventure</span><i>/</i><b>{pageTitle}</b></div><div className="top-actions"><Notifications supabase={supabase} userId={session.user.id} role={profile.role} onNavigate={(page)=>{setActive(page);setProfileMenuOpen(false);}}/><div style={{position:'relative'}}>
       <button type="button" onClick={()=>setProfileMenuOpen(v=>!v)} aria-expanded={profileMenuOpen} aria-haspopup="menu" aria-label="Buka menu profil" style={{display:'flex',alignItems:'center',gap:10,background:'transparent',border:'1px solid #e2e8f0',borderRadius:24,padding:'5px 10px 5px 5px',cursor:'pointer',color:'#24364f'}}>
         <div className="avatar small">{(profile.full_name||'U').slice(0,1).toUpperCase()}</div><span style={{fontSize:13,fontWeight:600,maxWidth:150,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{profile.full_name||'Profil Saya'}</span><ChevronDown size={15}/>
       </button>
