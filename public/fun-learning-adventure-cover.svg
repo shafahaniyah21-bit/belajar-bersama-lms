@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" role="img" aria-label="Modern digital learning illustration">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dff0ff"/><stop offset=".48" stop-color="#a9c9ff"/><stop offset="1" stop-color="#536ff1"/></linearGradient>
+  <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8bd8ff"/><stop offset=".5" stop-color="#416ce7"/><stop offset="1" stop-color="#7760ec"/></linearGradient>
+  <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#073c9b"/><stop offset=".55" stop-color="#347bfa"/><stop offset="1" stop-color="#b2a0ff"/></linearGradient>
+  <linearGradient id="bookBlue" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#65caff"/><stop offset="1" stop-color="#1558d4"/></linearGradient>
+  <linearGradient id="bookPurple" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bb9bff"/><stop offset="1" stop-color="#6844d8"/></linearGradient>
+  <linearGradient id="bookGold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe18b"/><stop offset="1" stop-color="#f49b2e"/></linearGradient>
+  <radialGradient id="orb"><stop stop-color="#fff"/><stop offset=".35" stop-color="#a9efff"/><stop offset="1" stop-color="#4282ff"/></radialGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="18"/><feOffset dy="15"/><feComponentTransfer><feFuncA type="linear" slope=".25"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="900" height="1100" fill="url(#bg)"/>
+<circle cx="40" cy="120" r="260" fill="#fff" opacity=".23"/><circle cx="870" cy="360" r="270" fill="#d9e9ff" opacity=".24"/>
+<g fill="none" stroke="#fff" stroke-width="3" opacity=".35">
+ <path d="M0 120h115V50h82V0M900 160h-100V85h-70V0M0 370h90v-90h90v-70M900 420h-82v-70h-75v-75"/>
+ <path d="M40 0v170h55v70M860 0v75h-50v48h-72"/>
+</g>
+<g fill="#fff" opacity=".22">
+ <circle cx="280" cy="95" r="5"/><circle cx="320" cy="95" r="5"/><circle cx="360" cy="95" r="5"/><circle cx="400" cy="95" r="5"/><circle cx="440" cy="95" r="5"/>
+ <circle cx="280" cy="135" r="5"/><circle cx="320" cy="135" r="5"/><circle cx="360" cy="135" r="5"/><circle cx="400" cy="135" r="5"/><circle cx="440" cy="135" r="5"/>
+</g>
+<g filter="url(#glow)" opacity=".85">
+ <circle cx="745" cy="250" r="28" fill="url(#orb)"/><circle cx="145" cy="505" r="17" fill="url(#orb)"/><circle cx="795" cy="715" r="14" fill="url(#orb)"/>
+</g>
+<g fill="none" stroke="#fff" opacity=".65" stroke-width="3">
+ <path d="M70 780C170 635 370 635 510 750s220 90 325-15"/>
+ <path d="M30 850c155-120 345-130 490-20s250 90 380-15"/>
+ <ellipse cx="465" cy="870" rx="420" ry="105" transform="rotate(-5 465 870)"/>
+</g>
+<g filter="url(#shadow)">
+ <!-- floating graduation cap -->
+ <g transform="translate(105 510)">
+  <path d="M-8 10L100-35 208 10 100 56z" fill="#174eae" stroke="#cce8ff" stroke-width="4"/>
+  <path d="M27 25v62c45 26 101 25 146-1V25L100 56z" fill="#123d91"/>
+  <path d="M194 10v72" stroke="#ffd36d" stroke-width="6"/><circle cx="194" cy="88" r="8" fill="#ffd36d"/>
+ </g>
+ <!-- atom -->
+ <g transform="translate(735 520)" fill="none" stroke="#eaf8ff" stroke-width="7" opacity=".95">
+  <ellipse rx="82" ry="33"/><ellipse rx="82" ry="33" transform="rotate(60)"/><ellipse rx="82" ry="33" transform="rotate(120)"/><circle r="15" fill="#59c7ff" stroke="none"/>
+ </g>
+ <!-- books -->
+ <g transform="translate(65 850)">
+  <path d="M5 72q95-50 220-15l-6 76q-110-28-214 18z" fill="url(#bookGold)" stroke="#fff0bd" stroke-width="5"/>
+  <path d="M-5 15q100-45 228-10l-2 75q-116-27-220 15z" fill="url(#bookPurple)" stroke="#e6d7ff" stroke-width="5"/>
+  <path d="M10-42q105-38 220-4l-6 72Q112 4 5 40z" fill="url(#bookBlue)" stroke="#b7eaff" stroke-width="5"/>
+  <path d="M28-29q95-28 178-6M22 29q102-35 183-8M28 99q90-32 177-7" fill="none" stroke="#fff" stroke-width="7" opacity=".65"/>
+ </g>
+ <!-- laptop -->
+ <g transform="translate(255 650)">
+  <path d="M65 0h355q22 0 25 22l38 245H24L42 25Q45 0 65 0z" fill="#102e70" stroke="#d8edff" stroke-width="8"/>
+  <rect x="59" y="18" width="363" height="220" rx="14" fill="url(#screen)"/>
+  <g filter="url(#glow)" transform="translate(240 130)" fill="none" stroke="#d6f5ff" stroke-width="7">
+   <path d="M-60-28q38-30 67 0v80q-29-28-67 0zM7-28q35-30 67 0v80q-32-28-67 0z" fill="#e9f8ff" stroke="#fff"/>
+   <path d="M-56-12h52m-52 25h52m-52 25h48M12-12h49M12 13h49" stroke="#5b9dff" stroke-width="4"/>
+   <ellipse rx="95" ry="40" transform="rotate(-18)" opacity=".65"/>
+  </g>
+  <path d="M0 270h500l110 54q9 9-6 14H-38q-16-6-4-17z" fill="#bddefb" stroke="#fff" stroke-width="6"/>
+  <path d="M190 280h115l-12 18h-95z" fill="#6486c5"/>
+  <path d="M-25 336h635" stroke="#fff" stroke-width="5" opacity=".5"/>
+ </g>
+ <!-- floating open book -->
+ <g transform="translate(705 690) rotate(-8)">
+  <path d="M-5 0q-55-25-105-4v105q55-20 105 6z" fill="#eef7ff" stroke="#fff" stroke-width="6"/>
+  <path d="M-5 0q50-26 105-5v106q-55-18-105 6z" fill="#dceaff" stroke="#fff" stroke-width="6"/>
+  <path d="M-84 25h57m-57 22h57m-57 22h52m-17-45h57m-57 23h57m-57 22h51" stroke="#8bb5f7" stroke-width="6" stroke-linecap="round" opacity=".8"/>
+ </g>
+ <!-- task/checklist tile -->
+ <g transform="translate(690 830) rotate(10)">
+  <rect x="-62" y="-75" width="140" height="150" rx="20" fill="#f1f6ff" fill-opacity=".85" stroke="#fff" stroke-width="5"/>
+  <g fill="none" stroke="#3071e8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M-36-35l12 12 21-28M-36 5l12 12 21-28M-36 45l12 12 21-28"/></g>
+  <g stroke="#9abaf0" stroke-width="7" stroke-linecap="round"><path d="M18-31h28M18 9h28M18 49h28"/></g>
+ </g>
+ <!-- play tile -->
+ <g transform="translate(190 690) rotate(-12)">
+  <rect x="-48" y="-48" width="96" height="96" rx="22" fill="url(#bookPurple)" stroke="#dcd0ff" stroke-width="5"/>
+  <path d="M-10-23v46l38-23z" fill="#fff"/>
+ </g>
+</g>
+<g fill="#fff" filter="url(#glow)"><path d="M175 680l10-27 10 27 27 10-27 10-10 27-10-27-27-10z"/><path d="M815 625l8-22 8 22 22 8-22 8-8 22-8-22-22-8z"/><path d="M340 570l7-18 7 18 18 7-18 7-7 18-7-18-18-7z"/></g>
+<path d="M0 1015q200-120 390-25t510-20v130H0z" fill="#315fdc" opacity=".8"/>
+<path d="M0 1055q210-95 410-15t490-10" stroke="#b3eaff" stroke-width="6" fill="none" opacity=".7"/>
+</svg>
