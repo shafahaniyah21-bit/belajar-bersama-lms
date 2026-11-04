@@ -770,3 +770,61 @@ body{background:#faf9f3}
  .adventure-panel .panel-head h3{font-size:14px}
  .announcement-card{min-height:120px;padding:15px}
 }
+
+
+/* Child-friendly login experience */
+.auth-page{min-height:100vh;grid-template-columns:minmax(0,1.05fr) minmax(430px,.95fr);background:#fffaf0}
+.auth-art{isolation:isolate;padding:34px clamp(28px,5vw,76px);background:linear-gradient(180deg,#9edcff 0%,#d8f1ff 56%,#b9e58b 56%,#8fcf70 100%);overflow:hidden}
+.auth-art:before{content:"";position:absolute;z-index:-1;width:390px;height:170px;left:-80px;bottom:-65px;border-radius:50%;background:#83c96c;box-shadow:280px -12px 0 20px #a8dc78,570px 5px 0 25px #75bd62}
+.auth-art:after{content:"";position:absolute;z-index:-1;width:140px;height:140px;right:9%;top:15%;border-radius:50%;background:rgba(255,255,255,.24);box-shadow:0 0 0 22px rgba(255,255,255,.1)}
+.auth-art>.brand{align-self:flex-start;background:rgba(255,255,255,.8);padding:10px 15px;border-radius:22px;box-shadow:0 8px 24px #3979a01c}
+.auth-art .brand-icon{background:#fff1bf;color:#588b4d}
+.auth-art .brand b{color:#204c82}
+.art-copy{margin:auto 0;max-width:520px;padding:26px 0 50px}
+.art-copy .eyebrow{display:inline-block;background:#fff0b8;color:#75511b;padding:9px 15px;border-radius:18px;letter-spacing:.8px}
+.art-copy h1{font-size:clamp(40px,5vw,66px);line-height:1.08;letter-spacing:-2px;color:#1763bc;text-shadow:0 3px 0 #fff;margin:22px 0 15px}
+.art-copy h1 br{display:block}
+.art-copy p{font-size:16px;max-width:390px;color:#234f80;font-weight:700;line-height:1.65;background:rgba(255,255,255,.78);padding:12px 16px;border-radius:18px}
+.art-stats{gap:12px;margin-top:22px}
+.art-stats span{background:#fffdf0;border:2px solid rgba(255,255,255,.85);border-radius:20px;padding:13px 14px;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:112px;color:#28558a;font-weight:800;box-shadow:0 7px 0 rgba(73,137,74,.12)}
+.art-stats span:nth-child(2){background:#f4eaff}
+.art-stats span:nth-child(3){background:#ffeaf1}
+.art-stats svg{width:24px;height:24px;color:#3d8c55}
+.art-footer{color:#fff;text-shadow:0 1px 5px #447c42;font-weight:800;position:relative;z-index:2}
+.kids-sky-decor{position:absolute;inset:0;pointer-events:none;z-index:-1}
+.kids-sky-decor span{position:absolute;filter:drop-shadow(0 5px 4px #477e3920)}
+.kids-sun{right:12%;top:5%;font-size:58px}.kids-rainbow{right:23%;top:20%;font-size:64px}
+.kids-cloud{right:3%;top:34%;font-size:54px}.kids-tree{left:-15px;bottom:14%;font-size:82px}
+.kids-school{right:5%;bottom:12%;font-size:75px}.kids-children{left:3%;bottom:3%;font-size:62px}
+.kids-books{right:4%;bottom:1%;font-size:42px}
+.auth-form-wrap{padding:clamp(24px,5vw,70px);background:radial-gradient(circle at 90% 8%,#f4e8ff 0,transparent 32%),linear-gradient(145deg,#fffdf6,#f8f5ff);position:relative}
+.auth-card{width:min(440px,100%);background:rgba(255,255,255,.88);border:2px solid #f0eaff;border-radius:28px;padding:clamp(24px,3vw,42px);box-shadow:0 18px 55px rgba(83,82,145,.12);gap:17px}
+.auth-card h2{font-size:32px;color:#21477b}
+.auth-card .eyebrow{color:#9865c7;background:#f5eaff;padding:7px 12px;border-radius:20px;justify-self:start}
+.auth-card label{font-size:13px;color:#254d7d}
+.auth-card input{padding:15px 16px;border:2px solid #e3e3f0;border-radius:14px;background:#fff;font-size:13px}
+.auth-card input:focus{border-color:#8e78d4;box-shadow:0 0 0 4px #f0eaff}
+.auth-card .primary{background:linear-gradient(100deg,#55a83f,#70b943);border-radius:15px;padding:15px;font-size:14px;box-shadow:0 5px 0 #438b32}
+.auth-card .primary:hover{background:linear-gradient(100deg,#469735,#62a934)}
+.auth-card .link{color:#4f963e;font-size:13px}
+.auth-card .switch{font-size:13px;color:#657b9b}
+.auth-card .security{font-size:10px;line-height:1.5;color:#8392a8}
+.mobile-brand{display:none}
+@media(max-width:760px){
+ .auth-page{grid-template-columns:1fr}
+ .auth-art{display:flex;min-height:240px;padding:20px 22px 28px}
+ .auth-art>.brand{padding:7px 10px}
+ .auth-art .brand-icon{width:36px;height:36px}
+ .art-copy{margin:22px 0 0;padding:0;max-width:100%}
+ .art-copy h1{font-size:34px;margin:12px 0 8px}
+ .art-copy p{font-size:12px;padding:8px 11px;margin:8px 0}
+ .art-stats{margin-top:12px;gap:7px}
+ .art-stats span{min-width:0;padding:8px 9px;font-size:9px;flex-direction:row}
+ .art-stats svg{width:17px;height:17px}
+ .art-footer{display:none}
+ .kids-sun{font-size:35px;right:5%;top:5%}.kids-rainbow{font-size:36px;right:17%;top:26%}
+ .kids-school,.kids-children,.kids-books{display:none}
+ .auth-form-wrap{min-height:auto;padding:25px 18px 34px}
+ .auth-card{padding:24px;border-radius:22px}
+ .mobile-brand{display:none}
+}
