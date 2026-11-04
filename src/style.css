@@ -106,3 +106,145 @@
 @media(max-width:760px){.auth-art{display:none}}
 
 .auth-art .art-copy{margin:clamp(28px,5vh,48px) 0 auto}
+
+/* ===== FUN LEARNING ADVENTURE: colorful, playful LMS visual identity ===== */
+:root{
+  --fla-ink:#25304d;
+  --fla-muted:#78839b;
+  --fla-violet:#7652d6;
+  --fla-pink:#ef70a6;
+  --fla-coral:#ff947c;
+  --fla-teal:#38b9ad;
+  --fla-sun:#ffc95c;
+  --fla-lilac:#eee8ff;
+  --fla-sky:#e5f4ff;
+  --fla-line:#ebe9f5;
+  font-family:'DM Sans',sans-serif;
+  color:var(--fla-ink);
+  background:#f8f7ff;
+}
+body{
+  background:
+    radial-gradient(ellipse at 8% 8%,rgba(255,211,225,.42),transparent 28%),
+    radial-gradient(ellipse at 92% 14%,rgba(196,224,255,.45),transparent 30%),
+    linear-gradient(135deg,#fbf8ff 0%,#f5f8ff 48%,#fff9f3 100%);
+  color:var(--fla-ink);
+}
+.app-shell{background:transparent}
+.sidebar{
+  background:rgba(255,255,255,.94);
+  border-right:1px solid rgba(219,216,240,.8);
+  box-shadow:8px 0 30px rgba(94,75,150,.045);
+  backdrop-filter:blur(18px);
+}
+.brand{color:var(--fla-violet);gap:10px}
+.brand-icon{
+  background:linear-gradient(135deg,#7257df 0%,#9b68e8 48%,#ed76ac 100%);
+  color:#fff;border-radius:15px;
+  box-shadow:0 7px 16px rgba(126,89,211,.23);
+}
+.brand b{
+  background:linear-gradient(90deg,#5943be 0%,#a14fc1 55%,#e66d9c 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-size:15px;line-height:1.13;letter-spacing:-.55px;
+}
+.brand small{color:#968ab6;font-size:7px;letter-spacing:1px}
+.workspace{
+  background:linear-gradient(125deg,#f0ebff 0%,#fff0f5 52%,#eaf9f7 100%);
+  border:1px solid #e9e1fa;border-radius:16px;
+  box-shadow:0 6px 18px rgba(109,83,169,.06);
+}
+.workspace-dot{background:var(--fla-teal);box-shadow:0 0 0 4px #d8f4ed}
+.workspace b{color:#594b91;font-size:11px}
+.workspace small{color:#8a7da8}
+.topbar{
+  background:rgba(255,255,255,.9);
+  border-bottom:1px solid rgba(226,222,241,.8);
+  backdrop-filter:blur(16px);
+}
+.breadcrumb{color:#8e86a7;font-size:11px}
+.breadcrumb b{color:#5948a7}
+.content{max-width:1540px}
+.page-heading .eyebrow{color:#a17cbd}
+.page-heading h1{color:#2e3155}
+.page-heading p{color:#85839f}
+.nav-item{border-radius:12px;color:#74738f;transition:background .18s ease,color .18s ease,transform .18s ease}
+.nav-item:hover{background:#f5f0ff;color:#7652d6;transform:translateX(2px)}
+.nav-item.selected{
+  background:linear-gradient(100deg,#eee8ff 0%,#fceaf3 100%);
+  color:#694bc4;box-shadow:inset 3px 0 #9065df;
+}
+.nav-item em{background:#ffe2ed;color:#bb5688}
+.primary{
+  background:linear-gradient(105deg,#7056d8 0%,#9a5bd3 52%,#e878a2 100%);
+  color:#fff;box-shadow:0 6px 16px rgba(139,86,193,.2);
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.primary:hover{background:linear-gradient(105deg,#6348ca,#8d4ec6,#df6895);transform:translateY(-1px);box-shadow:0 9px 20px rgba(139,86,193,.25)}
+.secondary{background:#f0ecff;color:#6651ae;border:1px solid #e7defa}
+.text-button,.link{color:#7754cc}
+.icon-button:hover{background:#f2edff;color:#7354c7}
+.panel,.stat-card,.course-card,.classroom-feed-post,.classroom-upcoming{
+  border-color:var(--fla-line);border-radius:17px;
+  box-shadow:0 7px 24px rgba(78,69,125,.045);
+}
+.panel{background:rgba(255,255,255,.94)}
+.panel h3,.section-head h3{color:#35335a}
+.section-head>span{color:#9a91b1}
+.stat-card{
+  position:relative;overflow:hidden;background:rgba(255,255,255,.96);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 24px rgba(84,70,140,.10)}
+.stat-card:nth-child(1) .stat-icon{background:#eee8ff;color:#7652d6}
+.stat-card:nth-child(2) .stat-icon{background:#ddf7f1;color:#239b8c}
+.stat-card:nth-child(3) .stat-icon{background:#fff0d8;color:#d68d2c}
+.stat-card:nth-child(4) .stat-icon{background:#ffe6ef;color:#d45e91}
+.stat-card strong{color:#36345b}
+.welcome-card{
+  background:
+    radial-gradient(circle at 86% 24%,rgba(255,255,255,.2) 0 9%,transparent 9.3%),
+    radial-gradient(circle at 95% 100%,rgba(255,220,125,.3) 0 14%,transparent 14.3%),
+    linear-gradient(115deg,#6954ce 0%,#9760d2 43%,#e779a4 76%,#ffab87 100%);
+  border:1px solid rgba(255,255,255,.45);
+  box-shadow:0 14px 28px rgba(136,91,190,.18);
+  min-height:205px;
+}
+.welcome-card h2{font-size:clamp(23px,2.3vw,30px);max-width:560px}
+.welcome-card .eyebrow.light{color:#ffe9f5}
+.welcome-card p{color:#fff1f6}
+.welcome-art{
+  background:linear-gradient(145deg,rgba(255,255,255,.29),rgba(255,255,255,.09));
+  color:#fff;border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 0 0 13px rgba(255,255,255,.08),0 0 0 27px rgba(255,255,255,.045);
+}
+.row-icon{background:#eee9ff;color:#7758d0;border-radius:13px}
+.course-card{overflow:hidden;background:#fff;transition:transform .2s ease,box-shadow .2s ease}
+.course-card:hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(95,76,148,.12)}
+.course-cover{background:linear-gradient(135deg,#e9e2ff,#fce7f1 58%,#e1f7f3);color:#7555c7}
+.classroom-class-card{background:linear-gradient(145deg,#fff 0%,#f5f0ff 100%);border-color:#e6def8;box-shadow:0 7px 20px rgba(107,80,166,.06)}
+.classroom-class-icon{background:linear-gradient(135deg,#e7e0ff,#ffe3ef);color:#7756cc}
+.classroom-banner{
+  background:
+    radial-gradient(circle at 90% 18%,rgba(255,255,255,.2) 0 7%,transparent 7.4%),
+    linear-gradient(115deg,#7057d6 0%,#a45fd0 55%,#ec7ca5 100%);
+  box-shadow:0 12px 26px rgba(131,83,180,.16);
+}
+.classroom-tabs button.selected{color:#7652d6;border-bottom-color:#d66eaf}
+.classroom-post-form,.classroom-feed-post,.classroom-upcoming{
+  border-color:#e9e3f5;box-shadow:0 6px 20px rgba(89,73,139,.045)
+}
+.classwork-tools{background:linear-gradient(110deg,#f3efff,#fff1f6 56%,#effaf8);border-color:#e8e0f4}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#a58be7!important;box-shadow:0 0 0 3px rgba(145,111,220,.13)}
+.pill{background:#f0ecff;color:#7055ba}
+.toast{border-color:#e8dff6}
+.settings-row,.list-row,.activity{border-color:#eee9f6}
+.auth-form-wrap{background:linear-gradient(145deg,#fffafd 0%,#f7f4ff 58%,#fff8f0 100%)}
+.auth-card h2{color:#35305c}
+.auth-card .eyebrow{color:#a36ec2}
+.security{color:#8983a2}
+@media(max-width:760px){
+  .brand b{font-size:15px}
+  .welcome-card{min-height:180px;padding:24px}
+  .welcome-art{margin-right:8px;width:95px;height:95px}
+}
