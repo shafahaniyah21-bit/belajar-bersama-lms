@@ -1029,3 +1029,34 @@ td{color:#274b70!important}
 .announcement-card{background:linear-gradient(110deg,#ffdb80,#ffb5ce)!important;border:3px solid #fff!important}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #168fe0!important;outline-offset:3px}
 @media(max-width:720px){.sidebar{background:linear-gradient(180deg,#c8edff,#e7f7ff 55%,#d8f4b5)!important}.content{background-size:auto!important}}
+
+
+/* Sidebar controls and signed-in user identity */
+.sidebar-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:48px}
+.sidebar-collapse-toggle{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border:2px solid #b8e5f8;border-radius:12px;background:#fff;color:#1764a4;cursor:pointer;box-shadow:0 3px 0 #d6edfa}
+.sidebar-collapse-toggle:hover{background:#ffeb83;color:#174f91}
+.sidebar-bottom{display:block!important;margin-top:auto!important;border-top:2px solid #bde5f6!important;padding:14px 2px 2px!important}
+.sidebar-user-card{display:flex;align-items:center;gap:10px;padding:11px;background:linear-gradient(120deg,#dff4ff,#e8f8cf);border:2px solid #fff;border-radius:16px;box-shadow:0 4px 0 rgba(44,125,163,.13);min-width:0}
+.sidebar-user-card .avatar{flex:0 0 38px;width:38px;height:38px;background:#ffdc54;color:#165a9b;border:2px solid #fff;font-size:16px}
+.sidebar-user-card .profile-text{min-width:0;flex:1}
+.sidebar-user-card .profile-text b{font-size:12px;color:#174f91}
+.sidebar-user-card .profile-text small{font-size:10px;color:#47718d;text-transform:none;margin-top:3px}
+.role-chip{display:inline-flex;margin-top:6px;padding:3px 8px;border-radius:20px;background:#55bd3e;color:#fff;font-size:10px;font-weight:900}
+.sidebar.collapsed{width:82px!important;padding-left:10px!important;padding-right:10px!important}
+.app-shell:has(.sidebar.collapsed) .main{margin-left:82px!important}
+.sidebar.collapsed .sidebar-topline{flex-direction:column;gap:10px}
+.sidebar.collapsed .brand{justify-content:center}
+.sidebar.collapsed .brand>div:last-child,.sidebar.collapsed .workspace,.sidebar.collapsed .nav-item span,.sidebar.collapsed .nav-item em,.sidebar.collapsed .sidebar-user-card .profile-text{display:none!important}
+.sidebar.collapsed .nav-item{justify-content:center;padding:13px 8px!important}
+.sidebar.collapsed .sidebar-bottom{padding:12px 0 0!important}
+.sidebar.collapsed .sidebar-user-card{justify-content:center;padding:8px 3px}
+.sidebar.collapsed .sidebar-user-card .avatar{flex-basis:38px}
+.sidebar.collapsed .sidebar-collapse-toggle{width:38px}
+@media(max-width:1100px){.app-shell:has(.sidebar.collapsed) .main{margin-left:82px!important}}
+@media(max-width:720px){
+ .sidebar,.sidebar.collapsed{width:265px!important;padding:28px 18px 18px!important}
+ .sidebar.collapsed .sidebar-topline{flex-direction:row}
+ .sidebar.collapsed .brand>div:last-child,.sidebar.collapsed .nav-item span,.sidebar.collapsed .sidebar-user-card .profile-text{display:block!important}
+ .sidebar.collapsed .nav-item{justify-content:flex-start;padding:11px 12px!important}
+ .app-shell:has(.sidebar.collapsed) .main{margin-left:0!important}
+}
