@@ -104,3 +104,5 @@
 .auth-art .art-stats svg{color:#1f65c5}
 .auth-art .art-footer{color:#fff;text-shadow:0 1px 8px rgba(13,47,115,.7);font-weight:600}
 @media(max-width:760px){.auth-art{display:none}}
+
+.auth-art .art-copy{margin:clamp(28px,5vh,48px) 0 auto}
