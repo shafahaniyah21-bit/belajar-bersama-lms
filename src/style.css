@@ -248,3 +248,92 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#a58be7!import
   .welcome-card{min-height:180px;padding:24px}
   .welcome-art{margin-right:8px;width:95px;height:95px}
 }
+
+
+/* Fun Learning Adventure — calm doodle-inspired visual refresh */
+:root{font-family:'DM Sans',sans-serif;color:#302f29;background:#fbf9f2}
+body{background:#fbf9f2}
+.sidebar{background:#fffdf7;border-right:1px solid #eee9dc}
+.brand{color:#354b36}
+.brand-icon{background:#e8f1d4;color:#557d3d;border-radius:15px}
+.brand small{color:#8a9279;letter-spacing:.8px}
+.workspace{background:#f4f6e8;border-color:#e8edcf}
+.workspace-dot{background:#80a85a;box-shadow:0 0 0 4px #e5efd4}
+.nav-label,.eyebrow{color:#92927d}
+.nav-item{color:#68685d;border-radius:13px}
+.nav-item.selected{background:#eaf0cf;color:#3f613b}
+.nav-item em{background:#dce8b7;color:#49653b}
+.main{background:#fbf9f2}
+.topbar{background:#fffdf8;border-bottom-color:#eee9dd}
+.breadcrumb{color:#898878}
+.breadcrumb b{color:#3c4937}
+.avatar{background:#e8edda;color:#4d7042}
+.icon-button{color:#727565}
+.icon-button:hover{background:#f0f1e5}
+.content{max-width:1560px}
+.page-heading h1{color:#30352b}
+.page-heading p{color:#858575}
+.primary{background:#668b4e;color:#fff;box-shadow:0 4px 10px #668b4e24;border-radius:11px}
+.primary:hover{background:#52763e}
+.secondary{background:#edf1df;color:#536b43;border-radius:10px}
+.welcome-card{background:linear-gradient(180deg,#c9def2 0%,#dceaf4 70%,#d5e5a5 70%,#c7dc8e 100%);border:1px solid #d5e2c2;border-radius:22px;color:#30372c;min-height:210px;padding:32px 36px;isolation:isolate}
+.welcome-card:before{content:"";position:absolute;z-index:-1;left:-3%;right:-3%;height:90px;bottom:-35px;background:#c9dd8f;border-radius:50% 50% 0 0/65% 65% 0 0;box-shadow:190px -8px 0 -8px #b9d17e,470px 5px 0 -5px #d8e7a5}
+.welcome-card:after{content:"☁";position:absolute;z-index:-1;right:28%;top:14px;font-size:62px;color:#fff;opacity:.9;text-shadow:140px 30px 0 #fff,-260px 58px 0 #fff}
+.welcome-card h2{color:#344c37;font-size:27px;line-height:1.25}
+.welcome-card p{color:#50654b;font-size:13px}
+.eyebrow.light{color:#58714c}
+.welcome-art{height:130px;width:170px;border-radius:0;background:transparent;color:#6e8d4e;margin-right:24px;box-shadow:none;position:relative}
+.welcome-art:before{content:"";position:absolute;inset:25px 10px 0;background:#f5e2b7;border:3px solid #a67d4c;border-radius:50% 50% 12px 12px;transform:rotate(-5deg);opacity:.95}
+.welcome-art svg{position:relative;z-index:1;color:#557e43;filter:drop-shadow(0 2px 0 #fff)}
+.section-head h3,.panel h3{color:#393a30}
+.section-head{margin-top:28px}
+.stat-card,.panel{background:#fffefa;border:1px solid #eee8dc;border-radius:17px;box-shadow:0 3px 12px #6f68400a}
+.stat-card{padding:19px}
+.stat-icon{border-radius:14px}
+.tone-0{background:#eee8fa;color:#9075b9}
+.tone-1{background:#e8f2d9;color:#628d42}
+.tone-2{background:#fff0d4;color:#d69a39}
+.tone-3{background:#fbe8e9;color:#d47d88}
+.stat-card span{color:#888778}
+.stat-card strong{color:#30372c}
+.row-icon{background:#eaf2df;color:#64884c}
+.list-row{border-top-color:#f0ece2}
+.activity-dot{background:#85a65d;box-shadow:0 0 0 4px #edf2df}
+.activity small,.row-copy small{color:#8a897b}
+.text-button,.link{color:#63874b}
+.pill{background:#edf2df;color:#5a7848}
+.pill.success{background:#e4f2df;color:#4d8452}
+.course-cover{background:linear-gradient(145deg,#e4f0d4,#cfe3b7);color:#587d42}
+table th{background:#f5f5e9;color:#858675}
+th,td{border-bottom-color:#eeeade}
+td{color:#66675a}
+td b{color:#3c4436}
+td select,.searchbox{border-color:#e7e4d8;background:#fffefa;color:#586b48}
+.modal{background:#fffdf7;border:1px solid #eee8dc}
+.modal input,.modal textarea,.auth-card input{border-color:#e5e1d4;background:#fffefa;color:#373b31}
+.modal input:focus,.modal textarea:focus,.auth-card input:focus{border-color:#9ebc7c;box-shadow:0 0 0 3px #edf3df}
+.auth-page{background:#fffdf7}
+.auth-art{background:linear-gradient(180deg,#d5e7f5 0%,#eaf1e7 58%,#d8e8a9 58%,#c8dd91 100%)}
+.art-copy h1{color:#3c593d}
+.art-copy p{color:#66775b}
+.art-stats span{color:#536f4a}
+.art-footer{color:#7d886d}
+.auth-card h2{color:#33392e}
+.muted{color:#888878}
+.security{color:#898a7b}
+.student-attendance-form{background:#f6f7ed;border-color:#e7ead8}
+.student-attendance-fields input,.student-attendance-fields select,.student-attendance-fields textarea{border-color:#e0e5d2;color:#3d4937;background:#fffefa}
+.classwork-tools{background:#f7f7ee;border-color:#e9e8d9}
+.toast{background:#eaf3df;color:#4f7845}
+.report-grid>div{background:#f6f6eb;border-color:#e9e9dc}
+.setup{background:#fffdf7;border-color:#ece7d9;color:#405d3b}
+.setup code{background:#eef2e2}
+.spinner{border-color:#e4e8d8;border-top-color:#729751}
+@media(max-width:720px){
+ .welcome-card{min-height:180px;padding:22px 19px}
+ .welcome-card h2{font-size:21px}
+ .welcome-art{width:86px;height:86px;margin:0}
+ .welcome-art:before{inset:18px 2px 0}
+ .welcome-art svg{width:48px}
+ .auth-form-wrap{background:linear-gradient(180deg,#edf3e2,#fffdf7)}
+}
