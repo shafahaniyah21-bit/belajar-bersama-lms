@@ -945,3 +945,21 @@ td{border-color:#edf2e6!important}
  .adventure-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .adventure-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+
+/* Student grading workspace */
+.grade-assignment{border:2px solid #e6f0dc;background:#fbfff7;border-radius:18px;padding:17px;margin:16px 0}
+.grade-assignment-title{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;color:#315d3c}
+.grade-assignment-title small,.grade-entry small,.grade-student-card small{display:block;color:#74866e;font-size:12px;margin-top:4px}
+.grade-entry{display:grid;grid-template-columns:minmax(150px,1fr) minmax(110px,150px) minmax(180px,1.2fr) auto;gap:12px;align-items:end;background:#fff;border:1.5px solid #e8eddf;border-radius:15px;padding:14px;margin-top:12px}
+.grade-entry>div{align-self:center;min-width:0}
+.grade-entry p{font-size:13px;color:#61745e;white-space:pre-wrap;overflow-wrap:anywhere}
+.grade-entry label{display:grid;gap:6px;font-size:12px;color:#47633f;font-weight:800}
+.grade-entry input,.grade-entry textarea{width:100%;box-sizing:border-box;border:1.5px solid #e3eadb;border-radius:11px;padding:10px;background:#fffefa;font:inherit}
+.grade-entry textarea{resize:vertical}
+.grade-entry .primary{white-space:nowrap}
+.grade-student-card{display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center;border:2px solid #e5efd9;background:linear-gradient(110deg,#f1f9e9,#eef8ff);border-radius:17px;padding:17px;margin:12px 0}
+.grade-student-card strong{font-size:23px;color:#397c45;background:#fff;border-radius:13px;padding:8px 14px}
+.grade-student-card p{grid-column:1/-1;margin:0;color:#536b50;background:#fffefa;border-radius:11px;padding:10px;white-space:pre-wrap}
+@media(max-width:850px){.grade-entry{grid-template-columns:1fr 1fr}.grade-entry>div,.grade-entry label:nth-of-type(2){grid-column:1/-1}.grade-entry .primary{grid-column:1/-1}}
+@media(max-width:520px){.grade-entry{grid-template-columns:1fr}.grade-entry>div,.grade-entry label:nth-of-type(2),.grade-entry .primary{grid-column:auto}}
