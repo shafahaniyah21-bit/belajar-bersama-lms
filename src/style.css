@@ -1132,3 +1132,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   border:1px solid #e8edf0!important;
   box-shadow:0 4px 13px rgba(36,73,101,.045)!important;
 }
+
+
+/* Dashboard announcement: plain white card */
+.adventure-announcements .announcement-card{
+  background:#ffffff!important;
+  background-image:none!important;
+  border:1px solid #e8edf0!important;
+  box-shadow:0 4px 12px rgba(36,73,101,.05)!important;
+}
+.adventure-announcements .announcement-card b{color:#263b50!important}
+.adventure-announcements .announcement-card p{color:#667789!important}
+.adventure-announcements .announcement-card small{color:#8794a2!important}
