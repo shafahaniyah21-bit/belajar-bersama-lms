@@ -622,7 +622,7 @@ async function deleteCourse(course) {
         <button type="button" role="menuitem" onClick={()=>{setProfileMenuOpen(false);logout()}} style={{display:'flex',alignItems:'center',gap:12,width:'100%',border:0,background:'transparent',padding:12,textAlign:'left',cursor:'pointer',color:'#b42318',borderTop:'1px solid #edf1f7',marginTop:5}}><LogOut size={18}/> Log Out</button>
       </div></>}
     </div></div></header>
-      <div className="content">{active!=='Dashboard'&&<div className="page-heading"><div><div className="eyebrow">RUANG KERJA {isAdmin?'ADMIN':isTeacher?'GURU':'MURID'}</div><h1>{active}</h1><p>{`Kelola ${active.toLowerCase()} Fun Learning Adventure.`}</p></div>{canManage&&['Kelas & Materi','Tugas & Kuis','Forum Diskusi'].includes(active)&&<button className="primary" onClick={openCreate}><Plus size={17}/> Tambah {active==='Kelas & Materi'?'Kelas':active==='Tugas & Kuis'?'Tugas':'Diskusi'}</button>}</div>
+      <div className="content">{active!=='Dashboard'&&<div className="page-heading"><div><div className="eyebrow">RUANG KERJA {isAdmin?'ADMIN':isTeacher?'GURU':'MURID'}</div><h1>{active}</h1><p>{`Kelola ${active.toLowerCase()} Fun Learning Adventure.`}</p></div>{canManage&&['Kelas & Materi','Tugas & Kuis','Forum Diskusi'].includes(active)&&<button className="primary" onClick={openCreate}><Plus size={17}/> Tambah {active==='Kelas & Materi'?'Kelas':active==='Tugas & Kuis'?'Tugas':'Diskusi'}</button>}</div>}
       {message&&<div className="toast"><CheckCircle2 size={17}/>{message}<button onClick={()=>setMessage('')}><X size={16}/></button></div>}
       {active==='Dashboard'&&<div className="dashboard-adventure">
         <section className="adventure-hero">
