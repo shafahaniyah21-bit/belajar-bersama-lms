@@ -1073,3 +1073,62 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .sidebar-bottom{margin-top:auto!important}
 .sidebar.collapsed{width:254px!important}
 .app-shell:has(.sidebar.collapsed) .main{margin-left:254px!important}
+
+
+/* Clean white navigation and page headers */
+.sidebar{
+  background:#ffffff!important;
+  border-right:1px solid #e8edf0!important;
+  box-shadow:3px 0 16px rgba(35,65,90,.045)!important;
+}
+.sidebar .sidebar-topline{
+  margin-bottom:14px!important;
+  padding-bottom:8px!important;
+}
+.sidebar .brand{margin-bottom:4px!important}
+.sidebar nav{
+  margin-top:14px!important;
+  padding-top:4px!important;
+  gap:7px!important;
+}
+.sidebar .workspace{
+  margin-top:8px!important;
+  margin-bottom:8px!important;
+  background:#fff!important;
+  border:1px solid #edf0e8!important;
+}
+.sidebar .nav-item{
+  background:transparent!important;
+  color:#31577b!important;
+}
+.sidebar .nav-item:hover{
+  background:#f4f7f9!important;
+  color:#174f83!important;
+}
+.sidebar .nav-item.selected{
+  background:#e8f5e2!important;
+  color:#286b3b!important;
+  box-shadow:inset 4px 0 #69bd4a!important;
+}
+/* Page title banners should be plain white, like the login card */
+.page-heading{
+  background:#ffffff!important;
+  border:1px solid #e9edf0!important;
+  border-radius:20px!important;
+  box-shadow:0 5px 16px rgba(36,73,101,.06)!important;
+  margin-bottom:23px!important;
+}
+.page-heading h1{
+  color:#174f91!important;
+  text-shadow:none!important;
+}
+.page-heading p{color:#5f7184!important}
+/* Discussion content and post cards stay clean white */
+.content:has(.forum-post){
+  background:#ffffff!important;
+}
+.forum-post,.forum-linked-post{
+  background:#ffffff!important;
+  border:1px solid #e8edf0!important;
+  box-shadow:0 4px 13px rgba(36,73,101,.045)!important;
+}
