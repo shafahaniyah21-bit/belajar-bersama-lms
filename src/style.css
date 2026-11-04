@@ -1060,3 +1060,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
  .sidebar.collapsed .nav-item{justify-content:flex-start;padding:11px 12px!important}
  .app-shell:has(.sidebar.collapsed) .main{margin-left:0!important}
 }
+
+
+/* Profile-triggered vertical sidebar menu */
+.sidebar-topline{justify-content:flex-start!important}
+.sidebar-collapse-toggle{display:none!important}
+.sidebar-user-card{width:100%;border:2px solid #fff;cursor:pointer;text-align:left;color:inherit;font:inherit}
+.sidebar-user-card:hover{filter:brightness(1.03);transform:translateY(-1px)}
+.sidebar-user-card .profile-menu-chevron{flex:0 0 18px;color:#1764a4}
+.sidebar nav{display:grid;gap:4px;overflow:hidden;transition:opacity .2s ease,transform .2s ease}
+.sidebar nav[hidden]{display:none!important}
+.sidebar-bottom{margin-top:auto!important}
+.sidebar.collapsed{width:254px!important}
+.app-shell:has(.sidebar.collapsed) .main{margin-left:254px!important}
