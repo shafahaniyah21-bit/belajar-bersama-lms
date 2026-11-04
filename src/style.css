@@ -876,3 +876,72 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
  .panel,.stat-card,.course-card,.classroom-class-card,.classroom-feed-post,.classroom-upcoming{border-radius:15px}
  .page-heading h1{line-height:1.25}
 }
+
+
+/* FLA STORYBOOK THEME — stronger, colorful classroom look across every inner page */
+body{background:#eaf7ff!important}
+.app-shell{background:linear-gradient(180deg,#dff3ff 0,#f4fbff 42%,#fff8e8 100%)!important;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,#eaf8ff 0%,#fffdf4 60%,#f1f9e9 100%)!important;border-right:2px solid #d8ebdf!important;box-shadow:5px 0 24px rgba(60,113,147,.06)}
+.sidebar .brand-icon{background:#fff0b8!important;color:#568a45!important;border-radius:16px!important}
+.sidebar .workspace{background:#fff!important;border:2px solid #d9edcf!important;border-radius:18px!important}
+.sidebar .nav-item{border-radius:15px!important;color:#426184!important;font-weight:700!important}
+.sidebar .nav-item.selected{background:#dff2d2!important;color:#397b45!important;box-shadow:inset 4px 0 #6ab34e!important}
+.sidebar .nav-item:hover{background:#f1f8df!important}
+.main{background:transparent!important}
+.topbar{background:rgba(255,253,245,.94)!important;border-bottom:2px solid #e5efd9!important;backdrop-filter:blur(8px)}
+.breadcrumb{color:#47739a!important}
+.breadcrumb b{color:#315d3c!important}
+.content{max-width:1600px!important;padding:26px 30px 70px!important;position:relative}
+.page-heading{background:linear-gradient(105deg,#d8f0ff,#e8f5d8 58%,#fff0d2)!important;border:2px solid #fff!important;border-radius:24px!important;padding:22px 26px!important;box-shadow:0 8px 0 rgba(126,174,109,.12)!important;margin-bottom:23px!important}
+.page-heading h1{color:#20518a!important;font-family:'Nunito','DM Sans',sans-serif!important;font-weight:900!important}
+.page-heading p{color:#456a76!important}
+.eyebrow,.page-heading .eyebrow{color:#8a6b36!important}
+.primary{background:linear-gradient(100deg,#55a943,#82bf4d)!important;border:0!important;border-radius:14px!important;box-shadow:0 4px 0 #438d39!important;color:#fff!important}
+.secondary{background:#eaf4ff!important;border:1.5px solid #d4e7f6!important;border-radius:13px!important;color:#386b9a!important}
+.panel,.stat-card,.course-card,.classroom-class-card,.classroom-feed-post,.classroom-upcoming,.adventure-panel{background:#fffefa!important;border:2px solid #fff!important;border-radius:21px!important;box-shadow:0 7px 18px rgba(73,111,76,.09)!important}
+.section-head h3,.panel h3{color:#315d3c!important;font-family:'Nunito','DM Sans',sans-serif!important;font-weight:900!important}
+.section-head{margin-top:27px!important}
+.stat-card{border-color:#e7f0dc!important}
+.stat-icon{border-radius:16px!important}
+.course-cover{background:linear-gradient(135deg,#bde7ff,#e1f6cf)!important;color:#3475a1!important}
+.course-body h3{color:#315d3c!important}
+.table-wrap{background:#fffefa!important;border:2px solid #fff!important;border-radius:18px!important;box-shadow:0 6px 18px rgba(73,111,76,.07)!important}
+th{background:#eaf5df!important;color:#557b46!important}
+td{border-color:#edf2e6!important}
+.modal{border:3px solid #fff!important;border-radius:24px!important;background:#fffdf6!important}
+.modal h2{color:#315d3c!important;font-family:'Nunito','DM Sans',sans-serif!important}
+.modal input,.modal textarea,.modal select{border:2px solid #e3ecd8!important;border-radius:13px!important}
+.classroom-banner{background:linear-gradient(110deg,#8fd3f4,#a8dc82 70%,#f7df9a)!important;border:2px solid white!important;border-radius:23px!important;color:#285b83!important;box-shadow:0 7px 0 rgba(92,151,77,.13)!important}
+.classroom-banner h2{color:#24537e!important}
+.classroom-tabs button.selected{background:#e5f4d8!important;color:#4c873e!important;border-radius:12px!important}
+.classroom-feed-post{border-color:#eaf0df!important}
+.classroom-upcoming{background:#fff8e8!important}
+.classwork-tools,.student-attendance-form{background:#eff8e8!important;border:2px solid white!important;border-radius:18px!important}
+.forum-post{background:#fffefa!important;border:2px solid #fff!important;border-radius:18px!important;padding:17px!important;box-shadow:0 5px 14px rgba(73,111,76,.06)!important}
+.report-grid>div{background:linear-gradient(135deg,#e2f3ff,#eff8df)!important;border:2px solid white!important;border-radius:18px!important}
+.settings-row{background:#fffefa!important;border:1px solid #edf0df!important;border-radius:14px!important;padding:15px!important;margin:8px 0!important}
+.toast{background:#e7f6db!important;color:#477a3e!important;border:1px solid #d4eac6!important;border-radius:15px!important}
+/* Dashboard: make the landscape and cards match the bright login illustration */
+.dashboard-adventure{background:transparent!important}
+.adventure-hero{height:285px!important;min-height:285px!important;border:3px solid #fff!important;border-radius:26px!important;background-color:#bfe8ff!important;background-image:linear-gradient(90deg,rgba(213,241,255,.38),rgba(213,241,255,.04)),url('/fla-adventure-dashboard.svg')!important;background-position:center!important;background-size:cover!important;box-shadow:0 8px 0 rgba(112,171,91,.15)!important}
+.adventure-hero:after{background:linear-gradient(90deg,rgba(222,244,255,.68),rgba(222,244,255,.18) 50%,transparent 76%)!important}
+.adventure-hero h2{color:#174d8a!important;font-family:'Nunito','DM Sans',sans-serif!important;font-weight:1000!important;text-shadow:0 2px #fff!important}
+.adventure-hero p{color:#315d69!important;font-weight:700!important}
+.adventure-stat{background:#fffefa!important;border:2px solid #fff!important;border-radius:20px!important;box-shadow:0 6px 0 rgba(112,171,91,.12)!important}
+.adventure-tone-0{background:#eee4ff!important;color:#8761c5!important}
+.adventure-tone-1{background:#d9f5ef!important;color:#149b83!important}
+.adventure-tone-2{background:#fff0d5!important;color:#d88a24!important}
+.adventure-tone-3{background:#ffe4ee!important;color:#d85b91!important}
+.adventure-shortcut{border:2px solid #fff!important;border-radius:23px!important;box-shadow:0 6px 0 rgba(112,171,91,.12)!important}
+.shortcut-sky{background:#dff2ff!important}.shortcut-sun{background:#fff0d5!important}.shortcut-mint{background:#e5f4d9!important}.shortcut-lilac{background:#f0e6ff!important}
+.adventure-shortcut b{color:#24578b!important;font-family:'Nunito','DM Sans',sans-serif!important;font-weight:1000!important}
+.adventure-shortcut small{color:#49656b!important}
+.adventure-panel{background:#fffefa!important}
+.announcement-card{background:linear-gradient(120deg,#fff0e6,#fff7d9)!important;border:2px solid white!important;border-radius:18px!important}
+@media(max-width:720px){
+ .content{padding:18px 14px 55px!important}
+ .page-heading{padding:17px!important;border-radius:19px!important}
+ .adventure-hero{height:235px!important;min-height:235px!important;border-radius:20px!important}
+ .adventure-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .adventure-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
