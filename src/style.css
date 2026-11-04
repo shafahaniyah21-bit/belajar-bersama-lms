@@ -1144,3 +1144,24 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .adventure-announcements .announcement-card b{color:#263b50!important}
 .adventure-announcements .announcement-card p{color:#667789!important}
 .adventure-announcements .announcement-card small{color:#8794a2!important}
+
+
+
+/* Keep material and assignment titles neutral and readable */
+.classroom-item,
+.assignment-card{
+  background:#ffffff!important;
+  background-image:none!important;
+}
+.classroom-item b,
+.assignment-card .row-copy > b,
+.assignment-card b{
+  color:#263b50!important;
+  background:transparent!important;
+  text-shadow:none!important;
+}
+.classroom-item h3,
+.classroom-feed-post h3{
+  color:#263b50!important;
+  background:transparent!important;
+}
