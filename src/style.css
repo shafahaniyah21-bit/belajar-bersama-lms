@@ -1165,3 +1165,20 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   color:#263b50!important;
   background:transparent!important;
 }
+
+
+
+/* Classroom title banner: plain white background */
+.classroom-banner{
+  background:#ffffff!important;
+  background-image:none!important;
+  color:#263b50!important;
+  border:2px solid #e8edf2!important;
+  box-shadow:0 5px 0 rgba(38,59,80,.06)!important;
+}
+.classroom-banner h2,
+.classroom-banner span,
+.classroom-banner p{
+  color:#263b50!important;
+  text-shadow:none!important;
+}
