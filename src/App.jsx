@@ -18,7 +18,7 @@ const menu = [
 ];
 
 function Brand() {
-  return <div className="brand"><div className="brand-icon"><GraduationCap size={25}/></div><div><b>Fun Learning Adventure</b><small>LEARNING MANAGEMENT SYSTEM</small></div></div>;
+  return <div className="brand"><div className="brand-icon"><GraduationCap size={25}/></div><div><b>Fun Learning Adventure</b><small>EXPLORE • LEARN • GROW</small></div></div>;
 }
 
 function SetupNotice() {
