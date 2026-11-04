@@ -963,3 +963,69 @@ td{border-color:#edf2e6!important}
 .grade-student-card p{grid-column:1/-1;margin:0;color:#536b50;background:#fffefa;border-radius:11px;padding:10px;white-space:pre-wrap}
 @media(max-width:850px){.grade-entry{grid-template-columns:1fr 1fr}.grade-entry>div,.grade-entry label:nth-of-type(2){grid-column:1/-1}.grade-entry .primary{grid-column:1/-1}}
 @media(max-width:520px){.grade-entry{grid-template-columns:1fr}.grade-entry>div,.grade-entry label:nth-of-type(2),.grade-entry .primary{grid-column:auto}}
+
+
+/* BRIGHT KIDS ADVENTURE PALETTE — vivid, high-contrast colors inspired by login screen */
+:root{
+ --fla-blue:#29a9e8;--fla-deep-blue:#1455a0;--fla-green:#55b936;
+ --fla-yellow:#ffd43b;--fla-pink:#ff6fae;--fla-purple:#9361df;
+}
+body{background:#e8f7ff!important;color:#183e68!important}
+.app-shell{background:linear-gradient(180deg,#bfeaff 0%,#e7f7ff 48%,#fff1c9 100%)!important}
+.sidebar{background:linear-gradient(180deg,#c8edff 0%,#e5f7ff 54%,#d8f4b5 100%)!important;border-right:3px solid #fff!important;box-shadow:5px 0 25px rgba(24,85,145,.12)!important}
+.sidebar .brand-icon{background:#ffe052!important;color:#27834b!important;box-shadow:0 4px 0 #e9b92b!important}
+.sidebar .brand b,.sidebar .brand strong{color:#174f91!important}
+.sidebar .nav-item{color:#174f83!important;font-weight:800!important}
+.sidebar .nav-item.selected{background:#70d34e!important;color:#174e31!important;box-shadow:inset 0 -4px 0 #3c9c35!important}
+.sidebar .nav-item:hover{background:#fff0a8!important;color:#174f91!important}
+.topbar{background:#fffdf4!important;border-bottom:3px solid #bce5f7!important}
+.breadcrumb,.breadcrumb b{color:#185995!important}
+.content{background-image:radial-gradient(circle at 96% 5%,rgba(255,211,59,.20) 0 52px,transparent 54px),radial-gradient(circle at 4% 42%,rgba(41,169,232,.10) 0 65px,transparent 67px)!important}
+.page-heading{background:linear-gradient(110deg,#39b8f2 0%,#77d9e9 38%,#9bdc55 72%,#ffdc62 100%)!important;border:3px solid #fff!important;box-shadow:0 7px 0 #b8dfc5!important}
+.page-heading h1{color:#104c91!important;text-shadow:0 2px #fff!important}
+.page-heading p{color:#174f75!important;font-weight:700!important}
+.page-heading .eyebrow,.eyebrow{color:#8b4b13!important;font-weight:900!important}
+.panel,.stat-card,.course-card,.classroom-class-card,.classroom-feed-post,.classroom-upcoming,.adventure-panel,.table-wrap{background:#fff!important;border:2px solid #fff!important;box-shadow:0 7px 0 rgba(32,105,155,.13)!important}
+.panel h3,.section-head h3{color:#14549a!important}
+.primary{background:linear-gradient(100deg,#38a9ed,#2474dc)!important;color:white!important;box-shadow:0 5px 0 #1554a5!important;border:0!important}
+.primary:hover{background:linear-gradient(100deg,#258fda,#175fc2)!important}
+.secondary{background:#ffdf55!important;border:2px solid #f2bd27!important;color:#71450a!important;box-shadow:0 3px 0 #d9a91c!important}
+.danger{background:#ff6b78!important;color:#fff!important}
+th{background:#bceaff!important;color:#124f8c!important}
+td{color:#274b70!important}
+.modal{background:#fffdf3!important;border:3px solid #fff!important;box-shadow:0 20px 65px rgba(23,77,135,.25)!important}
+.modal h2{color:#15549a!important}
+.modal input,.modal textarea,.modal select{background:#fff!important;border:2px solid #a9daf2!important;color:#173f6a!important}
+.modal input:focus,.modal textarea:focus,.modal select:focus{border-color:#299fe1!important;box-shadow:0 0 0 4px #d8f1ff!important}
+.classroom-banner{background:linear-gradient(105deg,#29a9e8 0%,#69d1ed 36%,#82d64b 70%,#ffcf48 100%)!important;border:3px solid #fff!important;color:#124c8a!important;box-shadow:0 7px 0 #b8dfc5!important}
+.classroom-banner h2{color:#104b91!important;text-shadow:0 2px #fff!important}
+.classroom-class-icon{background:#ffe05b!important;color:#1d65ae!important}
+.classroom-tabs button.selected{background:#56c83f!important;color:#164e28!important}
+.classwork-tools,.student-attendance-form{background:linear-gradient(110deg,#d9f3ff,#e4f8c9)!important;border:2px solid #fff!important}
+.forum-post{background:#fff!important;border:2px solid #ccecff!important}
+.report-grid>div{background:linear-gradient(135deg,#bfeaff,#d7f5ad)!important;border:2px solid #fff!important}
+.settings-row{background:#fff!important;border:2px solid #d7efff!important}
+.grade-assignment{background:#e9f8ff!important;border:2px solid #79c9ed!important}
+.grade-entry{background:#fff!important;border:2px solid #d7efff!important}
+.grade-entry label{color:#15549a!important}
+.grade-student-card{background:linear-gradient(110deg,#d5f1ff,#e2f7b9)!important;border:2px solid white!important}
+.grade-student-card strong{background:#ffdf55!important;color:#174f91!important}
+.adventure-hero{background-color:#8bd7ff!important;border:4px solid #fff!important;box-shadow:0 8px 0 #b7e6b2!important}
+.adventure-hero:after{background:linear-gradient(90deg,rgba(191,234,255,.22),transparent 75%)!important}
+.adventure-hero h2{color:#104f9a!important;text-shadow:0 2px #fff,0 4px 0 rgba(255,255,255,.65)!important}
+.adventure-hero p{color:#164e75!important}
+.adventure-stat{border:2px solid #fff!important;box-shadow:0 6px 0 rgba(35,111,155,.14)!important}
+.adventure-tone-0{background:#d8c4ff!important;color:#6535b7!important}
+.adventure-tone-1{background:#9cebdc!important;color:#087c69!important}
+.adventure-tone-2{background:#ffdc83!important;color:#99530b!important}
+.adventure-tone-3{background:#ffb6d2!important;color:#a72c68!important}
+.shortcut-sky{background:#8bd5ff!important}
+.shortcut-sun{background:#ffd76b!important}
+.shortcut-mint{background:#a9e77b!important}
+.shortcut-lilac{background:#d4b5ff!important}
+.adventure-shortcut{border:3px solid #fff!important;box-shadow:0 6px 0 rgba(35,111,155,.14)!important}
+.adventure-shortcut b{color:#124f91!important}
+.adventure-shortcut small{color:#234d6e!important;font-weight:700!important}
+.announcement-card{background:linear-gradient(110deg,#ffdb80,#ffb5ce)!important;border:3px solid #fff!important}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #168fe0!important;outline-offset:3px}
+@media(max-width:720px){.sidebar{background:linear-gradient(180deg,#c8edff,#e7f7ff 55%,#d8f4b5)!important}.content{background-size:auto!important}}
