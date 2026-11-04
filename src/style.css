@@ -426,3 +426,51 @@ body{background:#fffaf2;color:var(--fla-ink)}
 .content:has(.dashboard-adventure)>.page-heading{display:none}
 .topbar{position:sticky}
 .topbar:after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12'%3E%3Cpath d='M0 0H120V2Q105 15 90 2T60 2T30 2T0 2Z' fill='%23d5e7a6'/%3E%3C/svg%3E") repeat-x top left;background-size:120px 12px}
+
+
+/* ===== Approved Fun Learning Adventure storybook dashboard refinement ===== */
+.adventure-hero{
+  min-height:286px;
+  background-color:#cfe5f7;
+  background-image:url('/fla-adventure-dashboard.svg');
+  background-position:center;
+  background-size:cover;
+  border-radius:0 0 25px 25px;
+  box-shadow:none;
+  border:0;
+}
+.adventure-hero:after{
+  background:linear-gradient(90deg,rgba(220,239,255,.86) 0%,rgba(220,239,255,.68) 31%,rgba(220,239,255,.12) 52%,transparent 67%);
+}
+.adventure-hero-copy{max-width:490px;padding-left:0}
+.adventure-hero h2{font-size:clamp(29px,3vw,40px);line-height:1.16;color:#30271f;max-width:430px}
+.adventure-hero p{font-size:15px;color:#3d4a3d;max-width:390px}
+.adventure-section-head{margin:25px 0 13px}
+.adventure-section-head h3{font-size:20px;font-weight:800}
+.adventure-stat{min-height:96px;border-radius:20px;padding:15px 17px}
+.adventure-stat .stat-icon{width:58px;height:58px;border-radius:18px}
+.adventure-stat strong{font-size:27px}
+.adventure-shortcuts{gap:17px}
+.adventure-shortcut{min-height:190px;border-radius:23px;padding:13px 17px 17px;gap:4px}
+.shortcut-illustration{height:99px;width:100%;display:flex;align-items:center;justify-content:center}
+.shortcut-illustration img{display:block;width:min(100%,170px);height:100%;object-fit:contain;filter:drop-shadow(0 3px 1px rgba(74,58,35,.08))}
+.adventure-shortcut b{font-size:17px;line-height:1.25}
+.adventure-shortcut small{font-size:12px;max-width:175px}
+.shortcut-arrow{width:29px;height:29px;right:14px;bottom:13px}
+.adventure-bottom-grid{margin-top:24px}
+.adventure-panel{border-radius:22px}
+.adventure-panel .panel-head h3{font-size:18px}
+.announcement-card{min-height:160px}
+.dashboard-adventure{padding-bottom:92px}
+@media(max-width:1050px){
+ .adventure-hero{min-height:260px}
+ .adventure-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:720px){
+ .adventure-hero{min-height:230px;background-position:61% center;border-radius:0 0 20px 20px;padding:22px 18px}
+ .adventure-hero:after{background:linear-gradient(90deg,rgba(220,239,255,.95),rgba(220,239,255,.78) 52%,rgba(220,239,255,.18))}
+ .adventure-hero h2{font-size:27px;max-width:260px}
+ .adventure-hero p{font-size:13px;max-width:245px}
+ .shortcut-illustration{height:78px}
+ .adventure-shortcut{min-height:164px}
+}
