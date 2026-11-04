@@ -11,7 +11,7 @@
 <g stroke="#789c3f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
 <path d="M0 435q90-42 170-5q65-42 130-6" fill="none"/><path d="M1290 410q75-60 145-10q65-50 165-10" fill="none"/>
 </g>
-<g transform="translate(670 190)" stroke="#8c6138" stroke-width="9" stroke-linejoin="round">
+<g transform="translate(940 190)" stroke="#8c6138" stroke-width="9" stroke-linejoin="round">
 <path d="M110 250V30h35v220" fill="#b98149"/><path d="M0 45h270l-24 58H25z" fill="#f6d58c"/><path d="M18 48l115-35 119 35" fill="#e5b66f"/>
 <g fill="#fff0c8" stroke-width="7"><path d="M45 78h180l-16 43H61z"/><path d="M60 135h150l-14 42H74z"/><path d="M76 192h118l-12 39H88z"/></g>
 <g fill="#3f352b" stroke="none" font-family="Arial,sans-serif" font-size="34" font-weight="700" text-anchor="middle"><text x="135" y="110">Fun</text><text x="135" y="166">Learning</text><text x="135" y="220">Adventure</text></g>
