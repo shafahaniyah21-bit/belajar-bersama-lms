@@ -421,3 +421,8 @@ body{background:#fffaf2;color:var(--fla-ink)}
 .dashboard-grid .empty{min-height:100px}
 @media(max-width:1050px){.adventure-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}.adventure-bottom-grid{grid-template-columns:1fr}}
 @media(max-width:720px){.content{padding-top:20px}.adventure-hero{min-height:235px;padding:24px 20px;background-position:58% center}.adventure-hero:after{background:linear-gradient(90deg,rgba(220,239,255,.94),rgba(220,239,255,.7) 60%,rgba(220,239,255,.12))}.adventure-hero h2{font-size:26px;max-width:270px}.adventure-hero p{font-size:13px;max-width:260px}.adventure-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.adventure-stat{padding:12px;gap:9px}.adventure-stat .stat-icon{width:42px;height:42px}.adventure-stat strong{font-size:22px}.adventure-shortcuts{gap:10px}.adventure-shortcut{min-height:165px;padding:13px}.shortcut-illustration{height:65px}.adventure-shortcut b{font-size:14px}.adventure-shortcut small{font-size:11px}.adventure-panel{padding:16px}.adventure-panel .panel-head{flex-direction:row;align-items:center}.announcement-card{padding:18px}.announcement-card b{font-size:15px}}
+
+/* Dashboard starts directly with the illustrated welcome banner, as in the approved mockup */
+.content:has(.dashboard-adventure)>.page-heading{display:none}
+.topbar{position:sticky}
+.topbar:after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:10px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12'%3E%3Cpath d='M0 0H120V2Q105 15 90 2T60 2T30 2T0 2Z' fill='%23d5e7a6'/%3E%3C/svg%3E") repeat-x top left;background-size:120px 12px}
