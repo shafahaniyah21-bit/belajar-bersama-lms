@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import Notifications from './Notifications';
 import {
-  GraduationCap, LayoutDashboard, Users, BookOpen, ClipboardCheck,
+  GraduationCap, Cloud, LayoutDashboard, Users, BookOpen, ClipboardCheck,
   FileText, BarChart3, MessageCircle, Award, Settings, LogOut, Menu,
   Plus, Search, Bell, ShieldCheck, CalendarCheck, CheckCircle2, X, Upload, Download, Trash2, UserRound, KeyRound, ChevronDown
 } from 'lucide-react';
@@ -18,7 +18,7 @@ const menu = [
 ];
 
 function Brand() {
-  return <div className="brand"><div className="brand-icon"><GraduationCap size={25}/></div><div><b>Fun Learning Adventure</b><small>EXPLORE • LEARN • GROW</small></div></div>;
+  return <div className="brand"><div className="brand-icon"><Cloud size={29} strokeWidth={2.2}/></div><div><b>Fun Learning Adventure</b><small>EXPLORE • LEARN • GROW</small></div></div>;
 }
 
 function SetupNotice() {
