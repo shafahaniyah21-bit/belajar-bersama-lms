@@ -1,6 +1,6 @@
-# Belajar Bersama LMS
+# Fun Learning Adventure LMS
 
-Starter project LMS berbasis React + Vite + Supabase Auth/PostgreSQL. Nama tampilan Admin: **Admin Belajar Bersama** (nama profil dapat diubah).
+Starter project LMS berbasis React + Vite + Supabase Auth/PostgreSQL. Nama tampilan Admin: **Admin Fun Learning Adventure** (nama profil dapat diubah).
 
 ## Fitur dalam paket ini
 - Autentikasi email/password Supabase.
@@ -25,7 +25,7 @@ Beberapa menu skema database sudah tersedia, tetapi antarmuka CRUD lengkap untuk
 2. Buka Supabase → **SQL Editor**. Ganti email di bawah dengan email akunmu, lalu jalankan:
    ```sql
    update public.profiles
-   set role = 'admin', full_name = 'Admin Belajar Bersama'
+   set role = 'admin', full_name = 'Admin Fun Learning Adventure'
    where email = 'EMAIL_KAMU';
    ```
 3. Pastikan satu baris berubah. Jangan membagikan akses Admin. Akun publik baru tetap otomatis menjadi `murid`.
