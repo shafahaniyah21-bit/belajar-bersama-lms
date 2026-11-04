@@ -1,24 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500">
 <defs>
- <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#c8e5ff"/><stop offset="1" stop-color="#edf7ff"/></linearGradient>
- <linearGradient id="hill" x2="0" y2="1"><stop stop-color="#d8eaa2"/><stop offset="1" stop-color="#b9d879"/></linearGradient>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#c8e4fa"/><stop offset="1" stop-color="#eaf5fc"/></linearGradient>
+ <linearGradient id="grass" x2="0" y2="1"><stop stop-color="#d7e9a4"/><stop offset="1" stop-color="#b8d77b"/></linearGradient>
+ <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#f8d99d"/><stop offset="1" stop-color="#e9bd79"/></linearGradient>
 </defs>
 <rect width="1600" height="500" fill="url(#sky)"/>
-<g fill="#fff" opacity=".94"><path d="M105 150c-2-25 20-43 45-38 14-35 66-34 82 2 32-6 54 15 51 38H105z"/><path d="M870 94c0-22 20-39 43-34 13-31 60-31 74 1 27-5 47 13 44 33H870z"/><path d="M1260 155c-2-23 18-39 40-35 13-32 61-31 74 1 29-5 49 14 46 34h-160z"/></g>
-<g fill="#a7c9e6" opacity=".65"><path d="M1050 175q32-24 62 0q32-24 64 0q-30-7-62 8q-31-15-64-8z"/><path d="M1130 210q23-17 46 0q23-17 46 0q-22-5-46 6q-23-11-46-6z"/></g>
-<path d="M0 390Q180 310 350 365T700 365T1050 350T1400 350T1600 365V500H0Z" fill="#d9eaa7"/>
-<path d="M0 425Q200 355 400 405T800 395T1200 395T1600 405V500H0Z" fill="url(#hill)"/>
-<g stroke="#789c3f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
-<path d="M0 435q90-42 170-5q65-42 130-6" fill="none"/><path d="M1290 410q75-60 145-10q65-50 165-10" fill="none"/>
+<g fill="#fff" opacity=".97">
+ <path d="M65 142c-3-27 19-48 48-44 16-39 73-39 90 3 36-7 61 16 57 41z"/>
+ <path d="M690 90c-2-23 18-41 42-37 14-34 63-33 78 2 30-6 51 14 48 35z"/>
+ <path d="M1125 135c-2-25 19-44 45-40 15-36 68-35 84 2 32-6 56 15 52 38z"/>
+ <path d="M1370 180c-2-20 14-35 35-32 12-29 54-28 67 2 26-5 44 12 42 30z"/>
 </g>
-<g transform="translate(940 190)" stroke="#8c6138" stroke-width="9" stroke-linejoin="round">
-<path d="M110 250V30h35v220" fill="#b98149"/><path d="M0 45h270l-24 58H25z" fill="#f6d58c"/><path d="M18 48l115-35 119 35" fill="#e5b66f"/>
-<g fill="#fff0c8" stroke-width="7"><path d="M45 78h180l-16 43H61z"/><path d="M60 135h150l-14 42H74z"/><path d="M76 192h118l-12 39H88z"/></g>
-<g fill="#3f352b" stroke="none" font-family="Arial,sans-serif" font-size="34" font-weight="700" text-anchor="middle"><text x="135" y="110">Fun</text><text x="135" y="166">Learning</text><text x="135" y="220">Adventure</text></g>
+<g fill="#9fc5e3" opacity=".65"><path d="M1030 175q35-27 70 0q35-27 70 0q-35-8-70 9q-35-17-70-9z"/><path d="M1090 210q26-20 52 0q26-20 52 0q-26-6-52 7q-26-13-52-7z"/></g>
+<path d="M0 390Q150 340 310 374T630 367T930 365T1250 372T1600 350V500H0Z" fill="#d9eaa8"/>
+<path d="M0 425Q190 365 390 410T760 405T1120 395T1450 395T1600 410V500H0Z" fill="url(#grass)"/>
+<g fill="none" stroke="#85a956" stroke-width="7" stroke-linecap="round"><path d="M0 440q80-58 155-13q70-49 135-8"/><path d="M1320 420q80-68 150-12q65-47 130-4"/></g>
+<!-- wooden adventure sign -->
+<g transform="translate(760 185)" stroke="#805a35" stroke-width="9" stroke-linejoin="round">
+ <path d="M133 285V25h35v260" fill="#b47b43"/>
+ <path d="M8 58L132 10l260 48-28 58H34z" fill="url(#wood)"/>
+ <path d="M30 125h325l-24 66H55z" fill="#f8d99d"/>
+ <path d="M53 205h278l-22 63H75z" fill="#f8d99d"/>
+ <g fill="#35291f" stroke="none" font-family="Nunito,Arial,sans-serif" font-size="39" font-weight="900" text-anchor="middle"><text x="190" y="102">Fun</text><text x="190" y="169">Learning</text><text x="190" y="247">Adventure</text></g>
 </g>
-<g transform="translate(1280 220)" stroke="#8c623f" stroke-width="10" stroke-linejoin="round">
-<path d="M20 155V60l105-70 110 70v95z" fill="#fff0ce"/><path d="M0 68l125-95 130 95" fill="#e99c76"/><path d="M85 155v-62q40-45 80 0v62" fill="#b9d9f3"/><path d="M22 155h210" fill="none"/>
+<!-- cozy cottage -->
+<g transform="translate(1260 220)" stroke="#8a603d" stroke-width="10" stroke-linejoin="round">
+ <path d="M22 255V95l126-94 135 94v160z" fill="#fff0d0"/>
+ <path d="M0 103L148-14l159 117" fill="#e99a78"/>
+ <path d="M90 255v-92q58-65 116 0v92" fill="#c6e1f2"/>
+ <path d="M22 255h261" fill="none"/>
+ <rect x="40" y="125" width="45" height="56" rx="5" fill="#f8dfb0" stroke-width="6"/>
 </g>
-<g fill="#79a64a" stroke="#668c3c" stroke-width="7"><circle cx="1530" cy="265" r="72"/><circle cx="1475" cy="300" r="53"/><circle cx="1560" cy="330" r="56"/></g>
-<g fill="#fff5d8" stroke="#e9b94c" stroke-width="5"><circle cx="120" cy="430" r="17"/><circle cx="145" cy="415" r="12"/><circle cx="1440" cy="430" r="16"/><circle cx="1470" cy="410" r="11"/></g>
+<!-- trees and shrubs -->
+<g stroke="#668c3d" stroke-width="8" fill="#83ad50"><path d="M1480 390V240" fill="none" stroke="#8c6841" stroke-width="18"/><circle cx="1475" cy="225" r="73"/><circle cx="1415" cy="278" r="58"/><circle cx="1535" cy="290" r="62"/></g>
+<g stroke="#668c3d" stroke-width="7" fill="#9abd62"><circle cx="85" cy="440" r="43"/><circle cx="132" cy="430" r="51"/><circle cx="178" cy="448" r="38"/><circle cx="1355" cy="430" r="36"/></g>
+<!-- flowers -->
+<g stroke="#d6a83f" stroke-width="4" fill="#fff7dc">
+ <g transform="translate(300 425)"><circle cx="0" cy="-12" r="10"/><circle cx="12" cy="0" r="10"/><circle cx="0" cy="12" r="10"/><circle cx="-12" cy="0" r="10"/><circle r="6" fill="#eab94d"/></g>
+ <g transform="translate(1510 405)"><circle cy="-13" r="11"/><circle cx="13" r="11"/><circle cy="13" r="11"/><circle cx="-13" r="11"/><circle r="6" fill="#eab94d"/></g>
+ <g transform="translate(1160 442)"><circle cy="-10" r="8"/><circle cx="10" r="8"/><circle cy="10" r="8"/><circle cx="-10" r="8"/><circle r="5" fill="#eab94d"/></g>
+</g>
+<g fill="#fff5d9" stroke="#e8b84b" stroke-width="5"><circle cx="80" cy="430" r="13"/><circle cx="103" cy="413" r="9"/><circle cx="1450" cy="430" r="15"/><circle cx="1477" cy="410" r="10"/></g>
 </svg>
