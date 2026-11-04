@@ -627,3 +627,146 @@ body,.app-shell,.main{background:#fffaf4}
  .adventure-bottom-grid{margin-top:18px}.adventure-panel{padding:15px;min-height:0}
  .adventure-panel .panel-head h3{font-size:16px}.announcement-card{min-height:135px;padding:17px}
 }
+
+
+/* ===== Clean, consistent Fun Learning Adventure theme ===== */
+:root{
+  --fla-ink:#2f382c;
+  --fla-muted:#747b6d;
+  --fla-green:#66864f;
+  --fla-green-soft:#edf3e4;
+  --fla-cream:#fffdf8;
+  --fla-border:#e9e6dc;
+}
+html,body{background:#faf9f3;color:var(--fla-ink)}
+body{background:#faf9f3}
+.app-shell,.main{background:#faf9f3}
+.app-shell:before,.topbar:after,.sidebar:after{display:none!important}
+.sidebar{
+  width:250px;top:0;padding:25px 17px 16px;
+  background:#fffdf8;border-right:1px solid var(--fla-border);
+  box-shadow:none;backdrop-filter:none
+}
+.brand{margin:0;gap:10px;color:#354b36}
+.brand-icon{width:44px;height:44px;flex:0 0 44px;border-radius:13px;background:#eaf1df;color:#5f8048;box-shadow:none}
+.brand b{font:800 16px/1.15 'DM Sans',sans-serif;letter-spacing:-.35px;color:#354b36;background:none;-webkit-text-fill-color:initial}
+.brand small{font-size:8px;letter-spacing:.8px;color:#89917c;margin-top:4px}
+.workspace{display:flex;margin:25px 0 22px;padding:12px;background:#f5f7ed;border:1px solid #e9eddb;border-radius:12px;box-shadow:none}
+.workspace b{font-size:12px;color:#3d4b35}
+.workspace small{font-size:11px;color:#828a75}
+.nav-label{display:block;padding:0 11px 9px;color:#929783}
+.sidebar nav{margin-top:0;gap:4px}
+.nav-item{min-height:43px;padding:10px 12px;border-radius:10px;font:600 13px 'DM Sans',sans-serif;color:#687060;gap:11px}
+.nav-item svg{width:18px;height:18px}
+.nav-item:hover{background:#f3f5eb;color:#4e7040;transform:none}
+.nav-item.selected{background:#eaf1df;color:#47683c;box-shadow:none}
+.nav-item em{background:#dfeacb;color:#526c40}
+.sidebar-bottom{display:block;margin-top:auto;border-top:1px solid #efede5;padding-top:14px}
+.main{margin-left:250px;position:relative;z-index:1}
+.topbar{height:70px;padding:0 30px;background:#fffdf8;border-bottom:1px solid var(--fla-border);backdrop-filter:none;position:sticky;top:0}
+.breadcrumb{font-size:12px;color:#858a7b}
+.breadcrumb b{color:#3e4a37}
+.content{max-width:1500px;padding:28px 30px 48px}
+.content:has(.dashboard-adventure)>.page-heading{display:flex!important}
+.page-heading{margin-bottom:22px}
+.page-heading h1{font:700 25px 'DM Sans',sans-serif;color:#303a2e;letter-spacing:-.5px}
+.page-heading p{color:#7d8575}
+.eyebrow,.page-heading .eyebrow{color:#89917a}
+.primary{background:#66864f;color:white;border-radius:9px;box-shadow:none}
+.primary:hover{background:#557640;transform:none;box-shadow:none}
+.secondary{background:#f0f3e9;color:#526b43;border:1px solid #e5eadb;border-radius:9px}
+.text-button,.link{color:#5d7c49}
+.panel,.stat-card,.course-card,.classroom-feed-post,.classroom-upcoming{
+  background:#fffefa;border:1px solid var(--fla-border);border-radius:13px;box-shadow:0 2px 8px rgba(55,65,40,.035)
+}
+.panel h3,.section-head h3{color:#35402f}
+.section-head{margin:24px 0 13px}
+.section-head h3{font-size:16px}
+.section-head>span{color:#929584}
+.dashboard-adventure{padding:0 0 35px;max-width:none}
+.adventure-hero{
+  width:100%;margin:0;height:auto;min-height:205px;padding:30px 34px;
+  border-radius:16px;border:1px solid #e1e9d7;box-shadow:none;
+  background-color:#e8f1e1;
+  background-image:linear-gradient(90deg,rgba(235,244,229,.96) 0%,rgba(235,244,229,.88) 42%,rgba(235,244,229,.18) 100%),url('/fla-adventure-dashboard.svg');
+  background-position:center;background-size:cover
+}
+.adventure-hero:after{display:none}
+.adventure-hero-copy{max-width:480px}
+.adventure-hero h2{font:800 clamp(24px,2.5vw,32px)/1.2 'DM Sans',sans-serif;letter-spacing:-.6px;color:#34432f;margin:0 0 10px}
+.adventure-hero p{font-size:13px;line-height:1.6;color:#596650;max-width:390px}
+.adventure-section-head{margin:24px 0 12px}
+.adventure-section-head h3{font:700 17px 'DM Sans',sans-serif;color:#35402f}
+.adventure-section-head h3 span{color:#a5b879}
+.adventure-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.adventure-stat{min-height:82px;padding:14px;border:1px solid var(--fla-border);border-radius:13px;background:#fffefa;box-shadow:none;gap:11px}
+.adventure-stat .stat-icon{width:44px;height:44px;border-radius:11px}
+.adventure-stat span{font-size:11px;color:#7c8374}
+.adventure-stat strong{font:700 23px 'DM Sans',sans-serif;color:#303a2e}
+.adventure-tone-0{background:#eee9fa;color:#8871b4}
+.adventure-tone-1{background:#e8f1df;color:#63894b}
+.adventure-tone-2{background:#fff1dc;color:#c38a39}
+.adventure-tone-3{background:#f9e9ec;color:#c87888}
+.adventure-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.adventure-shortcut{height:auto;min-height:160px;border-radius:14px;padding:13px 14px;border:1px solid transparent;box-shadow:none;gap:5px}
+.adventure-shortcut:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(55,65,40,.07)}
+.shortcut-sky{background:#eaf3fa}
+.shortcut-sun{background:#fbf2df}
+.shortcut-mint{background:#edf4e7}
+.shortcut-lilac{background:#f1edf7}
+.shortcut-illustration{height:72px}
+.shortcut-illustration img{height:70px;max-width:130px}
+.adventure-shortcut b{font:700 14px 'DM Sans',sans-serif;color:#35402f}
+.adventure-shortcut small{font-size:11px;line-height:1.45;color:#687061;max-width:155px}
+.shortcut-arrow{width:25px;height:25px;right:11px;bottom:11px;border-width:1px;background:rgba(255,255,255,.7)}
+.adventure-bottom-grid{grid-template-columns:1.08fr .92fr;gap:14px;margin-top:18px}
+.adventure-panel{min-height:220px;padding:17px 18px;border:1px solid var(--fla-border);border-radius:14px;background:#fffefa;box-shadow:none}
+.adventure-panel .panel-head{margin-bottom:10px}
+.adventure-panel .panel-head h3{font:700 15px 'DM Sans',sans-serif;color:#35402f}
+.adventure-panel .panel-head p{display:block;font-size:11px;color:#929584}
+.adventure-list-row{padding:10px 0;border-top:1px solid #f0eee7}
+.adventure-list-row .row-icon{width:38px;height:38px;border-radius:10px}
+.adventure-list-row .row-copy b{font:600 12px 'DM Sans',sans-serif;color:#35402f}
+.adventure-list-row .row-copy small{font-size:11px;color:#858b7c}
+.announcement-card{min-height:130px;padding:19px;border-radius:12px;background:#fbf0ef}
+.announcement-card b{font:700 15px 'DM Sans',sans-serif;color:#394032}
+.announcement-card p{font-size:12px;color:#77766b}
+.announcement-card>span{font-size:36px}
+.dashboard-adventure:after{display:none}
+.classroom-banner{border-radius:14px;background:linear-gradient(110deg,#708d59,#9caf7d);box-shadow:none}
+.classroom-class-card{border-radius:13px;box-shadow:none;background:#fffefa;border-color:var(--fla-border)}
+.classroom-class-icon{background:#eaf1df;color:#66864f}
+.classwork-tools{background:#f5f6ef;border-color:#e8e9de}
+.student-attendance-form{background:#f5f7ef;border-color:#e7eadc}
+.toast{background:#edf4e7;color:#4e7540}
+@media(max-width:1050px){
+ .adventure-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .adventure-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .adventure-bottom-grid{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+ .sidebar{padding:22px 15px 14px}
+ .sidebar nav{margin-top:0}
+ .main{margin-left:0}
+ .topbar{height:62px;padding:0 14px}
+ .content{padding:20px 15px 35px}
+ .content:has(.dashboard-adventure)>.page-heading{display:flex!important}
+ .page-heading{gap:12px}
+ .page-heading h1{font-size:22px}
+ .adventure-hero{min-height:180px;padding:22px 18px;background-position:58% center}
+ .adventure-hero h2{font-size:24px;max-width:260px}
+ .adventure-hero p{font-size:12px;max-width:250px}
+ .adventure-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .adventure-stat{min-height:72px;padding:10px;gap:8px}
+ .adventure-stat .stat-icon{width:37px;height:37px}
+ .adventure-stat strong{font-size:20px}
+ .adventure-shortcuts{gap:9px}
+ .adventure-shortcut{min-height:145px;padding:10px}
+ .shortcut-illustration,.shortcut-illustration img{height:64px}
+ .adventure-shortcut b{font-size:12px}
+ .adventure-shortcut small{font-size:10px}
+ .adventure-panel{padding:14px;min-height:0}
+ .adventure-panel .panel-head{flex-direction:row;align-items:center}
+ .adventure-panel .panel-head h3{font-size:14px}
+ .announcement-card{min-height:120px;padding:15px}
+}
