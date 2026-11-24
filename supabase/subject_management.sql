@@ -45,6 +45,68 @@ create policy "profiles update own" on public.profiles for update to authenticat
 using (id = auth.uid() and role <> 'admin')
 with check (id = auth.uid() and role <> 'admin' and subject_id is not distinct from public.current_subject_id());
 
+-- Teachers can read learning content and grades only within their assigned subject.
+drop policy if exists "courses read" on public.courses;
+create policy "courses read" on public.courses for select to authenticated
+using (
+  public.is_admin()
+  or (public.is_teacher() and subject_id = public.current_subject_id())
+  or (not public.is_teacher() and (
+    class_id is null
+    or exists (select 1 from public.class_members m where m.class_id = courses.class_id and m.student_id = auth.uid())
+    or exists (select 1 from public.classes c where c.id = courses.class_id and c.teacher_id = auth.uid())
+  ))
+);
+
+drop policy if exists "assignments read" on public.assignments;
+create policy "assignments read" on public.assignments for select to authenticated
+using (
+  public.is_admin()
+  or (public.is_teacher() and subject_id = public.current_subject_id())
+  or (not public.is_teacher() and (
+    class_id is null
+    or exists (select 1 from public.class_members m where m.class_id = assignments.class_id and m.student_id = auth.uid())
+    or exists (select 1 from public.classes c where c.id = assignments.class_id and c.teacher_id = auth.uid())
+  ))
+);
+
+drop policy if exists "grades read" on public.grades;
+create policy "grades read" on public.grades for select to authenticated
+using (
+  student_id = auth.uid()
+  or public.is_admin()
+  or graded_by = auth.uid()
+  or (public.is_teacher() and exists (
+    select 1 from public.assignments a
+    where a.id = grades.assignment_id and a.subject_id = public.current_subject_id()
+  ))
+);
+
+drop policy if exists "staff manages grades" on public.grades;
+create policy "staff manages grades" on public.grades for all to authenticated
+using (
+  public.is_admin()
+  or (public.is_teacher() and exists (
+    select 1 from public.assignments a
+    where a.id = grades.assignment_id and a.subject_id = public.current_subject_id()
+  ))
+)
+with check (
+  public.is_admin()
+  or (public.is_teacher() and exists (
+    select 1 from public.assignments a
+    where a.id = grades.assignment_id and a.subject_id = public.current_subject_id()
+  ))
+);
+
+drop policy if exists "forum posts read" on public.forum_posts;
+create policy "forum posts read" on public.forum_posts for select to authenticated
+using (
+  public.is_admin()
+  or (public.is_teacher() and subject_id = public.current_subject_id())
+  or not public.is_teacher()
+);
+
 -- Content created by teachers must carry their assigned subject.
 drop policy if exists "staff manages courses" on public.courses;
 create policy "staff manages courses" on public.courses for all to authenticated
