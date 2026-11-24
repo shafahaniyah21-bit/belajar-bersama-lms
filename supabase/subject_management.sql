@@ -19,6 +19,15 @@ alter table public.forum_posts
 
 alter table public.subjects enable row level security;
 
+create or replace function public.current_subject_id()
+returns uuid language sql stable security definer
+set search_path = public
+as $
+  select subject_id from public.profiles where id = auth.uid()
+$;
+revoke all on function public.current_subject_id() from public;
+grant execute on function public.current_subject_id() to authenticated;
+
 drop policy if exists "subjects read authenticated" on public.subjects;
 create policy "subjects read authenticated"
 on public.subjects for select to authenticated
@@ -34,7 +43,7 @@ with check (public.is_admin());
 drop policy if exists "profiles update own" on public.profiles;
 create policy "profiles update own" on public.profiles for update to authenticated
 using (id = auth.uid() and role <> 'admin')
-with check (id = auth.uid() and role <> 'admin' and subject_id is not distinct from (select p.subject_id from public.profiles p where p.id = auth.uid()));
+with check (id = auth.uid() and role <> 'admin' and subject_id is not distinct from public.current_subject_id());
 
 -- Content created by teachers must carry their assigned subject.
 drop policy if exists "staff manages courses" on public.courses;
