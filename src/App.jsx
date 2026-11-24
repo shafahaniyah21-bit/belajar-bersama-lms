@@ -78,6 +78,7 @@ function App() {
   const [summary, setSummary] = useState({ users: 0, classes: 0, assignments: 0, attendance: 0 });
   const [users, setUsers] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [courses, setCourses] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -123,7 +124,7 @@ function App() {
 
   async function loadData() {
     if (!supabase) return;
-    const [u,c,co,a,at,p,g,sub,fr] = await Promise.all([
+    const [u,c,co,a,at,p,g,sub,fr,sj] = await Promise.all([
       supabase.from('profiles').select('id,full_name,email,role,created_at').order('created_at',{ascending:false}).limit(100),
       supabase.from('classes').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('courses').select('*').order('created_at',{ascending:false}).limit(100),
@@ -132,10 +133,11 @@ function App() {
       supabase.from('forum_posts').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('grades').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('submissions').select('*').order('submitted_at',{ascending:false}).limit(200),
-      supabase.from('forum_replies').select('*').order('created_at',{ascending:true}).limit(500)
+      supabase.from('forum_replies').select('*').order('created_at',{ascending:true}).limit(500),
+      supabase.from('subjects').select('*').order('name',{ascending:true})
     ]);
     setUsers(u.data||[]); setClasses(c.data||[]); setCourses(co.data||[]); setAssignments(a.data||[]);
-    setAttendance(at.data||[]); setPosts(p.data||[]); setForumReplies(fr.data||[]); setGrades(g.data||[]); setSubmissions(sub.data||[]);
+    setAttendance(at.data||[]); setPosts(p.data||[]); setForumReplies(fr.data||[]); setGrades(g.data||[]); setSubmissions(sub.data||[]); setSubjects(sj.data||[]);
     setSummary({users:u.data?.length||0,classes:c.data?.length||0,assignments:a.data?.length||0,attendance:at.data?.length||0});
   }
 
@@ -207,6 +209,7 @@ function App() {
           title: fd.get('title'),
           description: fd.get('description'),
           class_id: fd.get('class_id') || null,
+          subject_id: isTeacher ? profile.subject_id : (fd.get('subject_id') || null),
           created_by: session.user.id
         })
         .select('id')
@@ -389,7 +392,7 @@ async function deleteCourse(course) {
     try {
       const { data, error } = await supabase.from('assignments').insert({
         title: fd.get('title'), description: fd.get('description'),
-        due_at: fd.get('due_at') || null, class_id: fd.get('class_id') || null, created_by: session.user.id
+        due_at: fd.get('due_at') || null, class_id: fd.get('class_id') || null, subject_id: isTeacher ? profile.subject_id : (fd.get('subject_id') || null), created_by: session.user.id
       }).select('id').single();
       if (error) throw error;
       if (file instanceof File && file.size > 0) {
@@ -478,7 +481,7 @@ async function deleteCourse(course) {
   }
   async function createPost(e) {
     e.preventDefault(); const fd = new FormData(e.currentTarget);
-    const { error } = await supabase.from('forum_posts').insert({ title: fd.get('title'), body: fd.get('body'), class_id: fd.get('class_id') || null, author_id: session.user.id });
+    const { error } = await supabase.from('forum_posts').insert({ title: fd.get('title'), body: fd.get('body'), class_id: fd.get('class_id') || null, subject_id: isTeacher ? profile.subject_id : (fd.get('subject_id') || null), author_id: session.user.id });
     if (error) setMessage(error.message); else { setMessage('Diskusi berhasil dipublikasikan.'); setShowCreate(false); loadData(); }
   }
   async function replyToClassPost(e, postId) {
@@ -545,8 +548,27 @@ async function deleteCourse(course) {
   }
 
   async function changeRole(id, role) {
-    const { error } = await supabase.from('profiles').update({role}).eq('id',id);
+    const { error } = await supabase.from('profiles').update({role, ...(role !== 'guru' ? { subject_id: null } : {})}).eq('id',id);
     setMessage(error ? error.message : 'Peran pengguna diperbarui.'); if (!error) loadData();
+  }
+  async function assignTeacherSubject(teacherId, subjectId) {
+    const { error } = await supabase.from('profiles').update({ subject_id: subjectId || null }).eq('id', teacherId).eq('role','guru');
+    setMessage(error ? 'Gagal menetapkan mata pelajaran: '+error.message : 'Mata pelajaran guru berhasil diperbarui.');
+    if (!error) await loadData();
+  }
+  async function saveSubject(e) {
+    e.preventDefault(); if (!isAdmin || uploading) return;
+    const form=e.currentTarget; const name=String(new FormData(form).get('name')||'').trim();
+    if (!name) return;
+    setUploading(true); const {error}=await supabase.from('subjects').insert({name}); setUploading(false);
+    setMessage(error ? 'Gagal menambahkan mata pelajaran: '+error.message : 'Mata pelajaran berhasil ditambahkan.');
+    if (!error) { form.reset(); await loadData(); }
+  }
+  async function deleteSubject(subject) {
+    if (!isAdmin || uploading) return;
+    if (!window.confirm('Hapus mata pelajaran '+subject.name+'? Guru yang mengampu akan menjadi belum ditetapkan. Data pembelajaran lama tetap tersimpan.')) return;
+    setUploading(true); const {error}=await supabase.from('subjects').delete().eq('id',subject.id); setUploading(false);
+    setMessage(error ? 'Gagal menghapus mata pelajaran: '+error.message : 'Mata pelajaran dihapus.'); if (!error) await loadData();
   }
 
   async function saveMyProfile(e) {
@@ -663,7 +685,7 @@ async function deleteCourse(course) {
           </div>
         </article>)}{!posts.some(p=>p.class_id===openedClass.id)&&<div className="panel empty">Belum ada komentar di kelas ini.</div>}</div>}
       </section></div>}
-      {(active==='Data Guru'&&isAdmin||active==='Data Murid'&&(isAdmin||isTeacher))&&<section className="panel"><div className="panel-head"><div><h3>{active}</h3><p>{active==='Data Guru'?'Daftar akun yang login sebagai Guru.':'Daftar akun murid yang terdaftar.'}{isAdmin?' Perubahan peran akan otomatis memindahkan akun ke daftar sesuai perannya.':' Guru dapat melihat data murid, tetapi tidak dapat mengubah peran atau menghapus akun.'}</p></div><div className="searchbox"><Search size={16}/><input placeholder="Cari nama atau email…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Nama</th><th>Email</th>{isAdmin&&<th>Peran Login</th>}<th>Terdaftar</th>{isAdmin&&<th>Aksi</th>}</tr></thead><tbody>{roleFilteredUsers.map(u=><tr key={u.id}><td><b>{u.full_name||'—'}</b></td><td>{u.email||'—'}</td>{isAdmin&&<td><select value={u.role} disabled={uploading} onChange={e=>changeRole(u.id,e.target.value)}><option value="murid">Murid</option><option value="guru">Guru</option><option value="admin">Admin</option></select></td>}<td>{u.created_at?new Date(u.created_at).toLocaleDateString('id-ID'):'—'}</td>{isAdmin&&<td><button type="button" className="secondary" disabled={uploading} onClick={()=>deleteRegisteredUser(u)} style={{color:'#b42318',borderColor:'#fecdca',whiteSpace:'nowrap'}}><Trash2 size={14}/> Hapus pengguna</button></td>}</tr>)}</tbody></table></div>{!roleFilteredUsers.length&&<div className="empty">Belum ada akun {active==='Data Guru'?'guru':'murid'} yang sesuai pencarian.</div>}<p className="hint">{isAdmin?'Data dipisahkan berdasarkan peran akun yang tersimpan di Supabase. Hanya admin yang dapat mengubah peran atau menghapus akun.':'Daftar ini hanya untuk melihat data murid. Pengubahan peran dan penghapusan akun tetap khusus Admin.'}</p></section>}
+      {(active==='Data Guru'&&isAdmin||active==='Data Murid'&&(isAdmin||isTeacher))&&<section className="panel"><div className="panel-head"><div><h3>{active}</h3><p>{active==='Data Guru'?'Daftar akun yang login sebagai Guru.':'Daftar akun murid yang terdaftar.'}{isAdmin?' Perubahan peran akan otomatis memindahkan akun ke daftar sesuai perannya.':' Guru dapat melihat data murid, tetapi tidak dapat mengubah peran atau menghapus akun.'}</p></div><div className="searchbox"><Search size={16}/><input placeholder="Cari nama atau email…" value={search} onChange={e=>setSearch(e.target.value)}/></div></div><div className="table-wrap"><table><thead><tr><th>Nama</th><th>Email</th>{isAdmin&&<th>Peran Login</th>}{isAdmin&&active==='Data Guru'&&<th>Mata Pelajaran</th>}<th>Terdaftar</th>{isAdmin&&<th>Aksi</th>}</tr></thead><tbody>{roleFilteredUsers.map(u=><tr key={u.id}><td><b>{u.full_name||'—'}</b></td><td>{u.email||'—'}</td>{isAdmin&&<td><select value={u.role} disabled={uploading} onChange={e=>changeRole(u.id,e.target.value)}><option value="murid">Murid</option><option value="guru">Guru</option><option value="admin">Admin</option></select></td>}{isAdmin&&active==='Data Guru'&&<td><select value={u.subject_id||''} disabled={uploading} onChange={e=>assignTeacherSubject(u.id,e.target.value)}><option value="">Pilih mata pelajaran</option>{subjects.map(subject=><option key={subject.id} value={subject.id}>{subject.name}</option>)}</select></td>}<td>{u.created_at?new Date(u.created_at).toLocaleDateString('id-ID'):'—'}</td>{isAdmin&&<td><button type="button" className="secondary" disabled={uploading} onClick={()=>deleteRegisteredUser(u)} style={{color:'#b42318',borderColor:'#fecdca',whiteSpace:'nowrap'}}><Trash2 size={14}/> Hapus pengguna</button></td>}</tr>)}</tbody></table></div>{!roleFilteredUsers.length&&<div className="empty">Belum ada akun {active==='Data Guru'?'guru':'murid'} yang sesuai pencarian.</div>}{isAdmin&&active==='Data Guru'&&<div style={{marginTop:24,paddingTop:20,borderTop:'1px solid #e2e8f0'}}><h3>Kelola Mata Pelajaran</h3><p className="hint">Hanya Admin yang dapat menambah atau menghapus mata pelajaran dan menetapkan satu mata pelajaran untuk setiap guru.</p><form onSubmit={saveSubject} style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:16}}><input name="name" required maxLength="100" placeholder="Contoh: Matematika" style={{flex:'1 1 220px'}}/><button className="primary" disabled={uploading}><Plus size={15}/> Tambah Mata Pelajaran</button></form><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{subjects.map(subject=><span key={subject.id} className="pill" style={{display:'inline-flex',alignItems:'center',gap:8}}>{subject.name}<button type="button" className="link" disabled={uploading} onClick={()=>deleteSubject(subject)} aria-label={'Hapus '+subject.name}>×</button></span>)}</div>{!subjects.length&&<div className="empty">Belum ada mata pelajaran. Tambahkan melalui kolom di atas.</div>}</div>}<p className="hint">{isAdmin?'Data dipisahkan berdasarkan peran akun yang tersimpan di Supabase. Hanya admin yang dapat mengubah peran atau menghapus akun.':'Daftar ini hanya untuk melihat data murid. Pengubahan peran dan penghapusan akun tetap khusus Admin.'}</p></section>}
       {active==='Kelas & Materi'&&!openedClass&&<><div className="section-head"><h3>Daftar kelas</h3><span>{classes.length} kelas</span></div><div className="classroom-class-grid">{classes.map(c=><div key={c.id} className="classroom-class-card"><button type="button" className="classroom-open-button" onClick={()=>{setOpenedClassId(c.id);setClassTab('stream')}}><span className="classroom-class-icon"><BookOpen size={24}/></span><strong>{c.name}</strong><small>Guru: {c.teacher_name||users.find(u=>u.id===c.teacher_id)?.full_name||'Belum ditentukan'}</small><small>Buka ruang kelas →</small></button>{canManage&&(isAdmin||c.teacher_id===session.user.id)&&<button type="button" className="secondary" disabled={uploading} onClick={()=>deleteClass(c)} style={{color:'#b42318',borderColor:'#fecdca',marginTop:12}}><Trash2 size={15}/> Hapus Kelas</button>}</div>)}</div></>}
              {active==='Tugas & Kuis'&&<section className="panel"><div className="panel-head"><div><h3>Daftar tugas</h3><p>Tugas dan kuis pembelajaran</p></div></div><div className="classwork-tools"><label>Cari tugas<input value={classworkSearch} onChange={e=>setClassworkSearch(e.target.value)} placeholder="Cari judul atau instruksi…" /></label><label>Tampilkan<select value={classworkFilter} onChange={e=>setClassworkFilter(e.target.value)}><option value="semua">Semua tugas</option><option value="belum">Belum dikumpulkan</option><option value="terkumpul">Sudah dikumpulkan</option><option value="terlambat">Lewat tenggat</option></select></label></div>
          {assignments.filter(a => { const mine = submissions.find(s => s.assignment_id === a.id && s.student_id === session.user.id); const late = a.due_at && new Date(a.due_at).getTime() < Date.now(); const match = (a.title + ' ' + (a.description || '')).toLowerCase().includes(classworkSearch.toLowerCase()); return match && (classworkFilter === 'semua' || (classworkFilter === 'belum' && !mine) || (classworkFilter === 'terkumpul' && !!mine) || (classworkFilter === 'terlambat' && late && !mine)); }).map(a => {
