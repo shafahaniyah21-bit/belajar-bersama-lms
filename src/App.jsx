@@ -555,8 +555,18 @@ async function deleteCourse(course) {
   }
   async function assignTeacherSubject(teacherId, subjectId) {
     const { error } = await supabase.from('profiles').update({ subject_id: subjectId || null }).eq('id', teacherId).eq('role','guru');
-    setMessage(error ? 'Gagal menetapkan mata pelajaran: '+error.message : 'Mata pelajaran guru berhasil diperbarui.');
-    if (!error) await loadData();
+    if (error) { setMessage('Gagal menetapkan mata pelajaran: '+error.message); return; }
+    if (subjectId) {
+      const updates = await Promise.all([
+        supabase.from('courses').update({subject_id:subjectId}).eq('created_by',teacherId).is('subject_id',null),
+        supabase.from('assignments').update({subject_id:subjectId}).eq('created_by',teacherId).is('subject_id',null),
+        supabase.from('forum_posts').update({subject_id:subjectId}).eq('author_id',teacherId).is('subject_id',null)
+      ]);
+      const failed = updates.find(result=>result.error);
+      if (failed) { setMessage('Mata pelajaran guru tersimpan, tetapi sebagian konten lama belum berhasil dikategorikan: '+failed.error.message); await loadData(); return; }
+    }
+    setMessage('Mata pelajaran guru berhasil diperbarui. Konten lama yang belum berkategori ikut disesuaikan.');
+    await loadData();
   }
   async function saveSubject(e) {
     e.preventDefault(); if (!isAdmin || uploading) return;
