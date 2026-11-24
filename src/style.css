@@ -1182,3 +1182,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   color:#263b50!important;
   text-shadow:none!important;
 }
+
+
+/* Smaller assignment descriptions for Admin and Guru classwork lists */
+.assignment-card .assignment-body > small{font-size:11px!important;line-height:1.45!important;color:#7b8794!important;display:block;margin-top:4px;}
