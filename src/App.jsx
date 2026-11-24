@@ -53,6 +53,7 @@ function Auth({ onLogin }) {
       } else {
         const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
         if (err) throw err;
+        await supabase.from('login_activities').insert({user_id:data.user.id,email:data.user.email,full_name:data.user.user_metadata?.full_name||null}).then(()=>{}).catch(()=>{});
         onLogin(data.session);
       }
     } catch (e) { setError(e.message || 'Terjadi kesalahan.'); }
@@ -132,7 +133,7 @@ function App() {
 
   async function loadData() {
     if (!supabase) return;
-    const [u,c,co,a,at,p,g,sub,fr,sj] = await Promise.all([
+    const [u,c,co,a,at,p,g,sub,fr,sj,la] = await Promise.all([
       supabase.from('profiles').select('id,full_name,email,role,subject_id,nisn,class_id,class_name,created_at').order('created_at',{ascending:false}).limit(100),
       supabase.from('classes').select('*').order('created_at',{ascending:false}).limit(100),
       supabase.from('courses').select('*').order('created_at',{ascending:false}).limit(100),
@@ -146,7 +147,7 @@ function App() {
       supabase.from('login_activities').select('*').order('logged_at',{ascending:false}).limit(500)
     ]);
     setUsers(u.data||[]); setClasses(c.data||[]); setCourses(co.data||[]); setAssignments(a.data||[]);
-    setAttendance(at.data||[]); setPosts(p.data||[]); setForumReplies(fr.data||[]); setGrades(g.data||[]); setSubmissions(sub.data||[]); setSubjects(sj.data||[]); setLoginActivities(arguments); setLoginActivities(arguments);
+    setAttendance(at.data||[]); setPosts(p.data||[]); setForumReplies(fr.data||[]); setGrades(g.data||[]); setSubmissions(sub.data||[]); setSubjects(sj.data||[]); setLoginActivities(la.data||[]);
     setSummary({users:u.data?.length||0,classes:c.data?.length||0,assignments:a.data?.length||0,attendance:at.data?.length||0});
   }
 
