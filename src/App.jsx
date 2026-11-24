@@ -885,7 +885,7 @@ async function deleteCourse(course) {
     />
   </label>
 )}
-{active==='Tugas & Kuis'&&<><label>Tenggat waktu<input name="due_at" type="datetime-local"/></label><label>Lampiran tugas (opsional, maks. 20 MB)<input name="attachment" type="file"/></label></>}{createKind!=='class'&&<label>{active==='Forum Diskusi'?'Isi diskusi':'Deskripsi / instruksi'}<textarea name={active==='Forum Diskusi'?'body':'description'} rows="4" placeholder="Tulis keterangan…" /></label>}<button className="primary full" disabled={uploading}><Plus size={16}/>{uploading?'Mengunggah…':'Simpan'}</button></form></div></div>}
+{active==='Tugas & Kuis'&&<><label>Tenggat waktu<input name="due_at" type="datetime-local"/></label><label>Lampiran tugas (opsional, maks. 20 MB)<input name="attachment" type="file"/></label></>}{createKind!=='class'&&<label>{active==='Forum Diskusi'?'Isi diskusi':'Deskripsi / instruksi'}<textarea name={active==='Forum Diskusi'?'body':'description'} rows={active==='Tugas & Kuis'?2:4} style={active==='Tugas & Kuis'?{height:72,minHeight:72,maxHeight:72,resize:'none'}:undefined} placeholder="Tulis keterangan…" /></label>}<button className="primary full" disabled={uploading}><Plus size={16}/>{uploading?'Mengunggah…':'Simpan'}</button></form></div></div>}
   </div>;
 }
 
